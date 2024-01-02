@@ -1,0 +1,11 @@
+li {
+  white-space: nowrap;
+  padding: 0 30px;
+}
+a,
+a:focus {
+  color: white;
+}
+a:hover {
+  color: lightblue;
+}
