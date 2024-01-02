@@ -7,7 +7,4 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'badmintonapp';
-  // waiting players
-  // courts
-  // all players
 }
