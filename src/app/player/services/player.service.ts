@@ -4,14 +4,14 @@ export interface Player {
   name: string;
   skillId: 0 | 1 | 2 | 3 | 4;
 }
-enum PlayerSkillLevelDesc {
+export enum PlayerSkillLevelDesc {
   Cracked = 'cracked',
   Strong = 'strong',
   Good = 'good',
   Amateur = 'amateur',
   New = 'new',
 }
-enum PlayerSkillLevelColour {
+export enum PlayerSkillLevelColour {
   Cracked = '#f30da9',
   Strong = '#f30d0d',
   Good = '#f3af0d',
