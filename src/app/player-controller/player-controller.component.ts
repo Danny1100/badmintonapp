@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import {
   Player,
   PlayerService,
@@ -13,13 +12,16 @@ import {
 })
 export class PlayerControllerComponent {
   skillLevels: PlayerSkillData[] = [];
-  addedPlayer!: Player;
+  addedPlayer: Player = { name: '', skillId: 0 };
 
   getRadioStyle(playerSkillLevel: PlayerSkillData) {
     return {
       width: '150px',
       border: `1px solid ${playerSkillLevel.colour}`,
     };
+  }
+  addPlayer() {
+    console.log(this.addedPlayer);
   }
 
   constructor(private playerService: PlayerService) {}

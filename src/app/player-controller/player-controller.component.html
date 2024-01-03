@@ -3,7 +3,13 @@
     <form>
       <div class="mb-3">
         <label for="playerName" class="form-label">Player Name</label>
-        <input type="text" class="form-control" id="playerName" />
+        <input
+          type="text"
+          class="form-control"
+          id="playerName"
+          name="playerName"
+          [(ngModel)]="addedPlayer.name"
+        />
       </div>
       <div class="mb-4">
         <label for="playerSkillId" class="form-label">Player Skill Level</label>
@@ -12,26 +18,30 @@
           id="playerSkillId"
           class="btn-group"
           role="group"
-          *ngFor="let lvl of skillLevels"
+          *ngFor="let lvl of skillLevels; let i = index"
         >
           <div class="mx-3">
             <input
               type="radio"
-              class="btn-check"
+              class="btn-check form-control"
               name="player-skill-level"
-              id="player-skill-radio-buttons"
+              id="{{ i }}"
               autocomplete="off"
+              [(ngModel)]="addedPlayer.skillId"
+              value="{{ i }}"
             />
             <label
               class="btn player-skill-level-label"
-              for="player-skill-radio-buttons"
+              for="{{ i }}"
               [ngStyle]="getRadioStyle(lvl)"
               >{{ lvl.skillLevel }}</label
             >
           </div>
         </div>
       </div>
-      <button type="submit" class="btn btn-primary">Add player</button>
+      <button type="submit" class="btn btn-primary" (click)="addPlayer()">
+        Add player
+      </button>
     </form>
   </div>
   <div class="player-list-container my-5 mx-3">
