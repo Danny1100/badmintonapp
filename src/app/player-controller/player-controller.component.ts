@@ -7,6 +7,8 @@ import {
   PlayerSkillLevelDesc,
 } from '../player/services/player.service';
 import { NgForm } from '@angular/forms';
+import { PlayerListService } from '../player-list/player-list.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-player-controller',
@@ -14,8 +16,10 @@ import { NgForm } from '@angular/forms';
   styleUrls: ['./player-controller.component.css'],
 })
 export class PlayerControllerComponent {
+  currentId: number = 0;
   skillLevels: PlayerSkillData[] = [];
-  addedPlayer: Player = { name: '', skillId: 0 };
+  addedPlayer: Player = { id: this.currentId, name: '', skillId: 0 };
+  playerList$: BehaviorSubject<Player[]> = this.playerListService.getPlayers();
 
   getRadioStyle(playerSkillLevel: PlayerSkillData, index: number) {
     return {
@@ -26,7 +30,8 @@ export class PlayerControllerComponent {
     };
   }
   resetForm() {
-    this.addedPlayer = { name: '', skillId: 0 };
+    this.currentId++;
+    this.addedPlayer = { id: this.currentId, name: '', skillId: 0 };
     this.updateRadioButtons(
       {
         skillLevel: PlayerSkillLevelDesc.Cracked,
@@ -40,11 +45,14 @@ export class PlayerControllerComponent {
       alert('Missing player name');
       return;
     }
-    console.log(this.addedPlayer);
+    this.playerListService.addPlayer(this.addedPlayer);
     this.resetForm();
   }
 
-  constructor(private playerService: PlayerService) {}
+  constructor(
+    private playerService: PlayerService,
+    private playerListService: PlayerListService,
+  ) {}
 
   ngOnInit() {
     this.skillLevels = this.playerService.getSkillMap();

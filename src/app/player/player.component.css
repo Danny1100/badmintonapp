@@ -1,13 +1,14 @@
 .player-container {
   display: flex;
-  width: 180px;
-  height: 40px;
+  width: 150px;
+  height: 35px;
   padding: 10px;
   justify-content: center;
   align-items: center;
-  border-radius: 10px;
+  border-radius: 5px;
 }
 .player-name {
+  margin: 0;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
 export interface Player {
+  id: number;
   name: string;
   skillId: 0 | 1 | 2 | 3 | 4;
 }

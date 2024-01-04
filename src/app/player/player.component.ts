@@ -16,7 +16,9 @@ export class PlayerComponent {
   constructor(private playerService: PlayerService) {}
 
   ngOnInit(): void {
-    const { skillLevel, colour } = this.playerService.getPlayerDetails(this.id);
+    const { skillLevel, colour } = this.playerService.getPlayerDetails(
+      this.skillId,
+    );
     this.skillLevel = skillLevel;
     this.colour = colour;
   }
