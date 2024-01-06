@@ -6,26 +6,16 @@
   </head>
   <body>
     <div class="container-fluid p-3">
-      <div
-        class="court-list-container mb-3"
-        *ngFor="let court of courts$ | async"
-      >
-        <div class="court-container mb-3">
-          <app-court
-            [courtNumber]="court.courtNumber"
-            [players]="court.players"
-          ></app-court>
+      <div class="court-list-container">
+        <div *ngFor="let court of courts$ | async">
+          <div class="court-container mb-3">
+            <app-court
+              [courtNumber]="court.courtNumber"
+              [players]="court.players"
+            ></app-court>
+          </div>
         </div>
       </div>
-      <!-- <app-player [id]="0" [name]="'Danny Cai'" [skillId]="0"></app-player>
-      <app-player
-        [id]="1"
-        [name]="'Nishamini Gunasinghe'"
-        [skillId]="1"
-      ></app-player>
-      <app-player [id]="2" [name]="'Kevin Chang'" [skillId]="2"></app-player>
-      <app-player [id]="3" [name]="'Darren Lin'" [skillId]="3"></app-player>
-      <app-player [id]="4" [name]="'Darren Lin'" [skillId]="4"></app-player> -->
     </div>
   </body>
 </html>

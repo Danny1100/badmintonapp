@@ -18,8 +18,5 @@ export class HomeComponent {
     private matchmakingService: MatchmakingService,
   ) {}
 
-  ngOninit() {
-    this.courts$.subscribe((obj) => console.log(obj));
-    console.log('ran');
-  }
+  ngOninit() {}
 }
