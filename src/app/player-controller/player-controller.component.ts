@@ -6,7 +6,6 @@ import {
   PlayerSkillLevelColour,
   PlayerSkillLevelDesc,
 } from '../player/services/player.service';
-import { NgForm } from '@angular/forms';
 import { PlayerListService } from '../player-list/player-list.service';
 import { BehaviorSubject } from 'rxjs';
 
@@ -24,8 +23,6 @@ export class PlayerControllerComponent {
   getRadioStyle(playerSkillLevel: PlayerSkillData, index: number) {
     return {
       width: '150px',
-      'background-color':
-        index === this.addedPlayer.skillId ? playerSkillLevel.colour : 'white',
       border: `1px solid ${playerSkillLevel.colour}`,
     };
   }
@@ -56,6 +53,9 @@ export class PlayerControllerComponent {
 
   ngOnInit() {
     this.skillLevels = this.playerService.getSkillMap();
+  }
+  ngAfterViewInit() {
+    this.updateRadioButtons(this.skillLevels[0], 0);
   }
   updateRadioButtons(lvl: PlayerSkillData, index: number) {
     const elements = document.querySelectorAll('.player-skill-level-label');
