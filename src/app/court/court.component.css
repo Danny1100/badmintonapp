@@ -1,6 +1,40 @@
 .court-container {
-  width: 150px;
-  height: 100px;
+  width: 320px;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   border: 1px solid black;
   border-radius: 10px;
+}
+
+.header {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.header h5 {
+  margin: 0;
+}
+
+.players {
+  flex: 5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+hr {
+  width: 320px;
+  margin: 0;
 }
