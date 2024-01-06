@@ -9,3 +9,7 @@ a:focus {
 a:hover {
   color: lightblue;
 }
+.navbar-toggler {
+  color: white;
+  background-color: white;
+}
