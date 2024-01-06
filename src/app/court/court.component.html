@@ -1,1 +1,27 @@
-<p>court works!</p>
+<div class="court-container container">
+  <div class="header">
+    <h5>Court Number: {{ courtNumber }}</h5>
+    <hr />
+  </div>
+
+  <div class="players">
+    <div *ngIf="players.length > 0; else noPlayers">
+      <div *ngFor="let player of players">
+        <app-player
+          [id]="player.id"
+          [name]="player.name"
+          [skillId]="player.skillId"
+        ></app-player>
+      </div>
+    </div>
+    <ng-template #noPlayers>
+      <p>No players</p>
+    </ng-template>
+    <hr />
+  </div>
+
+  <div class="footer">
+    <button class="btn btn-primary">Next players</button>
+    <button class="btn btn-danger">Remove Court</button>
+  </div>
+</div>

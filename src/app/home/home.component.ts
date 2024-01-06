@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { Player } from '../player/services/player.service';
+import { Court } from '../court/court.component';
 
 @Component({
   selector: 'app-home',
@@ -6,7 +8,10 @@ import { Component } from '@angular/core';
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent {
-  // waiting players
-  // courts
-  // all players
+  courts!: Court[];
+  waitingPlayers!: Player[];
+
+  constructor() {}
+
+  ngOninit() {}
 }
