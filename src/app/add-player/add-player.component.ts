@@ -6,15 +6,15 @@ import {
   PlayerSkillLevelColour,
   PlayerSkillLevelDesc,
 } from '../player/services/player.service';
-import { PlayerListService } from '../player-list/player-list.service';
 import { BehaviorSubject } from 'rxjs';
+import { PlayerListService } from '../player-list/player-list.service';
 
 @Component({
-  selector: 'app-player-controller',
-  templateUrl: './player-controller.component.html',
-  styleUrls: ['./player-controller.component.css'],
+  selector: 'app-add-player',
+  templateUrl: './add-player.component.html',
+  styleUrls: ['./add-player.component.css'],
 })
-export class PlayerControllerComponent {
+export class AddPlayerComponent {
   currentId: number = 0;
   skillLevels: PlayerSkillData[] = [];
   addedPlayer: Player = { id: this.currentId, name: '', skillId: 0 };

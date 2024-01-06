@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { PlayerControllerComponent } from './player-controller/player-controller.component';
 import { HomeComponent } from './home/home.component';
+import { AddPlayerComponent } from './add-player/add-player.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
-  { path: 'edit-players', component: PlayerControllerComponent },
+  { path: 'add-players', component: AddPlayerComponent },
 ];
 
 @NgModule({
