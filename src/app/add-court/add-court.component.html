@@ -1,0 +1,23 @@
+<div class="form-container m-3">
+  <form>
+    <div>
+      <label for="courtNumber" class="form-label">Court Number</label>
+      <div class="add-court-input-container">
+        <input
+          type="text"
+          class="form-control"
+          id="courtNumber"
+          name="courtNumber"
+          [(ngModel)]="courtNumber"
+        />
+        <button
+          type="submit"
+          class="btn btn-primary btn-submit"
+          (click)="addCourt()"
+        >
+          Add court
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

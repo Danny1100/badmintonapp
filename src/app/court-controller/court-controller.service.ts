@@ -17,7 +17,11 @@ export class CourtControllerService {
       ],
     },
     {
-      courtNumber: 1,
+      courtNumber: 2,
+      players: [],
+    },
+    {
+      courtNumber: 3,
       players: [],
     },
   ]);
@@ -27,6 +31,14 @@ export class CourtControllerService {
   getCourts() {
     return this.courts$;
   }
-  addCourt() {}
-  removeCourt() {}
+  addCourt(courtNumber: number) {
+    const courts = this.courts$.getValue();
+    if (courts.find((court) => court.courtNumber === courtNumber)) {
+      alert('Court already exists');
+      return;
+    }
+    courts.push({ courtNumber, players: [] });
+    this.courts$.next(courts);
+  }
+  removeCourt(courtNumber: number) {}
 }

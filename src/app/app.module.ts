@@ -10,6 +10,7 @@ import { CourtComponent } from './court/court.component';
 import { HomeComponent } from './home/home.component';
 import { HeaderComponent } from './header/header.component';
 import { AddPlayerComponent } from './add-player/add-player.component';
+import { AddCourtComponent } from './add-court/add-court.component';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { AddPlayerComponent } from './add-player/add-player.component';
     HomeComponent,
     HeaderComponent,
     AddPlayerComponent,
+    AddCourtComponent,
   ],
   imports: [
     BrowserModule,
