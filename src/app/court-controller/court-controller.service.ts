@@ -40,5 +40,9 @@ export class CourtControllerService {
     courts.push({ courtNumber, players: [] });
     this.courts$.next(courts);
   }
-  removeCourt(courtNumber: number) {}
+  removeCourt(courtNumber: number) {
+    let courts = this.courts$.getValue();
+    courts = courts.filter((court) => court.courtNumber !== courtNumber);
+    this.courts$.next(courts);
+  }
 }

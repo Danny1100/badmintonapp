@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Player } from '../player/services/player.service';
+import { CourtControllerService } from '../court-controller/court-controller.service';
 
 export interface Court {
   courtNumber: number;
@@ -14,4 +15,10 @@ export interface Court {
 export class CourtComponent {
   @Input({ required: true }) courtNumber!: number;
   @Input({ required: true }) players!: Player[];
+
+  constructor(private courtControllerService: CourtControllerService) {}
+
+  removeCourt() {
+    this.courtControllerService.removeCourt(this.courtNumber);
+  }
 }
