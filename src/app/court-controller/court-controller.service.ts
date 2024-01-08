@@ -45,4 +45,14 @@ export class CourtControllerService {
     courts = courts.filter((court) => court.courtNumber !== courtNumber);
     this.courts$.next(courts);
   }
+  updateCourt(court: Court) {
+    let courts = this.courts$.getValue();
+    courts = courts.map((c) => {
+      if (court.courtNumber === c.courtNumber) {
+        return court;
+      }
+      return c;
+    });
+    this.courts$.next(courts);
+  }
 }

@@ -29,8 +29,15 @@ export class MatchmakingService {
     this.waitingPlayers$.next(waitingPlayers);
   }
   cycleCourt(court: Court) {
-    console.log(court);
-    // if there are players on the court, move them all to the bottom of the waiting players list
+    // if there are players on the court, move them all to the bottom of the waiting players list and update the court list
+    if (court.players.length > 0) {
+      let waitingPlayers = this.waitingPlayers$.getValue();
+      court.players.forEach((player) => waitingPlayers.push(player));
+      this.waitingPlayers$.next(waitingPlayers);
+
+      this.courtControllerService.updateCourt({ ...court, players: [] });
+      return;
+    }
     // if not, run matchmaking algorithm, remove them from the waiting players list, and put them in a court
   }
 
