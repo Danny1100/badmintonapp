@@ -16,16 +16,14 @@ export class HomeComponent {
     this.matchmakingService.getWaitingPlayers();
   courts$: BehaviorSubject<Court[]> = this.courtControllerService.getCourts();
 
-  removePlayer(playerId: number) {
-    this.playerListService.removePlayer(playerId);
-    this.matchmakingService.removeWaitingPlayer(playerId);
-  }
-
   constructor(
     private playerListService: PlayerListService,
     private courtControllerService: CourtControllerService,
     private matchmakingService: MatchmakingService,
   ) {}
 
-  ngOninit() {}
+  removePlayer(playerId: number) {
+    this.playerListService.removePlayer(playerId);
+    this.matchmakingService.removeWaitingPlayer(playerId);
+  }
 }

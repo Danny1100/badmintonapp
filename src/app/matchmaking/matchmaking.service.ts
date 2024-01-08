@@ -28,6 +28,11 @@ export class MatchmakingService {
     waitingPlayers = waitingPlayers.filter((player) => player.id !== playerId);
     this.waitingPlayers$.next(waitingPlayers);
   }
+  cycleCourt(court: Court) {
+    console.log(court);
+    // if there are players on the court, move them all to the bottom of the waiting players list
+    // if not, run matchmaking algorithm, remove them from the waiting players list, and put them in a court
+  }
 
   constructor(
     private playerListService: PlayerListService,
@@ -43,8 +48,5 @@ export class MatchmakingService {
     this.courtList$.subscribe((courts) => (this.courtList = courts));
   }
 
-  // what happens when you add a new court - update courtList??
   // what happens when you remove a court with existing players - players should be moved to waiting players list
-  // what happens when you add a new player - update playerList??
-  // what happens when you remove a player - shouldn't be on a court, should remove from playerlist and waitingplayerlist
 }

@@ -20,6 +20,11 @@ export class AddPlayerComponent {
   addedPlayer: Player = { id: this.currentId, name: '', skillId: 0 };
   playerList$: BehaviorSubject<Player[]> = this.playerListService.getPlayers();
 
+  constructor(
+    private playerService: PlayerService,
+    private playerListService: PlayerListService,
+  ) {}
+
   getRadioStyle(playerSkillLevel: PlayerSkillData, index: number) {
     return {
       width: '150px',
@@ -45,11 +50,6 @@ export class AddPlayerComponent {
     this.playerListService.addPlayer(this.addedPlayer);
     this.resetForm();
   }
-
-  constructor(
-    private playerService: PlayerService,
-    private playerListService: PlayerListService,
-  ) {}
 
   ngOnInit() {
     this.skillLevels = this.playerService.getSkillMap();
