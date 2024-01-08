@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, ReplaySubject } from 'rxjs';
 import { Player } from '../player/services/player.service';
 
 @Injectable({
@@ -7,15 +7,26 @@ import { Player } from '../player/services/player.service';
 })
 export class PlayerListService {
   playerList$: BehaviorSubject<Player[]> = new BehaviorSubject<Player[]>([]);
+  addedPlayer$: ReplaySubject<Player> = new ReplaySubject<Player>();
 
   constructor() {}
 
   getPlayers() {
     return this.playerList$;
   }
+  getAddedPlayerStream() {
+    return this.addedPlayer$;
+  }
   addPlayer(player: Player) {
     const newPlayerList = this.playerList$.getValue();
     newPlayerList.push(player);
     this.playerList$.next(newPlayerList);
+
+    this.addedPlayer$.next(player);
+  }
+  removePlayer(playerId: number) {
+    let playerList = this.playerList$.getValue();
+    playerList = playerList.filter((player) => player.id !== playerId);
+    this.playerList$.next(playerList);
   }
 }
