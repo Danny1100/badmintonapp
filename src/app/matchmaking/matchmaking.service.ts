@@ -28,6 +28,7 @@ export class MatchmakingService {
     waitingPlayers = waitingPlayers.filter((player) => player.id !== playerId);
     this.waitingPlayers$.next(waitingPlayers);
   }
+  matchmake(waitingPlayers: Player[]) {}
   cycleCourt(court: Court) {
     // if there are players on the court, move them all to the bottom of the waiting players list and update the court list
     if (court.players.length > 0) {
@@ -39,6 +40,14 @@ export class MatchmakingService {
       return;
     }
     // if not, run matchmaking algorithm, remove them from the waiting players list, and put them in a court
+    // when to run matchmaking algorithm? every time a new player is added from any source?
+    const waitingPlayers = this.waitingPlayers$.getValue();
+    if (waitingPlayers.length < 4) {
+      alert('Not enough players to matchmake');
+      return;
+    }
+    const nextPlayers = this.matchmake(waitingPlayers);
+    // what happens when you remove a court with existing players - players should be moved to waiting players list
   }
 
   constructor(
@@ -54,6 +63,4 @@ export class MatchmakingService {
     this.playerList$.subscribe((players) => (this.playerList = players));
     this.courtList$.subscribe((courts) => (this.courtList = courts));
   }
-
-  // what happens when you remove a court with existing players - players should be moved to waiting players list
 }
