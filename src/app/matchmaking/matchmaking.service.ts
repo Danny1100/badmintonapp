@@ -61,9 +61,32 @@ export class MatchmakingService {
         courtPlayers = [];
       }
     });
-    console.log(waitingGroups);
-    this.waitingGroups$.next(waitingGroups);
     // whoever is highest in the waiting list in each group will determine how early they are in the group queue
+    const sortedWaitingGroups: Court[] = [];
+    const visited = new Set();
+    let c = 0;
+    waitingPlayers.forEach((player) => {
+      if (visited.has(player.id)) return;
+      c++;
+      let foundIndex = -1;
+      for (let i = 0; i < waitingGroups.length; i++) {
+        const group = waitingGroups[i];
+        for (let j = 0; j < group.players.length; j++) {
+          const p = group.players[j];
+          if (player.id === p.id) {
+            foundIndex = i;
+          }
+        }
+      }
+      if (foundIndex > -1) {
+        const foundGroup = waitingGroups[foundIndex];
+        foundGroup.players.forEach((p) => visited.add(p.id));
+        sortedWaitingGroups.push(foundGroup);
+        waitingGroups.splice(foundIndex, 1);
+        console.log(foundGroup.players.map((p) => p.id));
+      }
+    });
+    this.waitingGroups$.next(sortedWaitingGroups);
   }
   cycleCourt(court: Court) {
     // if there are players on the court, move them all to the bottom of the waiting players list and update the court list
