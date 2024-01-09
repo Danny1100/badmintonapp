@@ -29,6 +29,10 @@ export class CourtComponent {
     });
   }
   removeCourt() {
+    if (this.players.length > 0) {
+      alert('Cannot remove court, there are still people playing');
+      return;
+    }
     this.courtControllerService.removeCourt(this.courtNumber);
   }
 }
