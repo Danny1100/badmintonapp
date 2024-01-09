@@ -25,7 +25,7 @@
           class="player-list-item mb-3"
           *ngFor="let player of waitingPlayers$ | async; let i = index"
         >
-          <span>{{ i + 1 }}. </span>
+          <span class="li-number">{{ i + 1 }}. </span>
           <app-player
             [id]="player.id"
             [name]="player.name"
