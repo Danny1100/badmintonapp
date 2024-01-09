@@ -15,9 +15,14 @@ import { PlayerListService } from '../player-list/player-list.service';
   styleUrls: ['./add-player.component.css'],
 })
 export class AddPlayerComponent {
-  currentId: number = 0;
+  currentId$: BehaviorSubject<number> =
+    this.playerListService.getCurrentPlayerId();
   skillLevels: PlayerSkillData[] = [];
-  addedPlayer: Player = { id: this.currentId, name: '', skillId: 0 };
+  addedPlayer: Player = {
+    id: this.currentId$.getValue(),
+    name: '',
+    skillId: 0,
+  };
   playerList$: BehaviorSubject<Player[]> = this.playerListService.getPlayers();
 
   constructor(
@@ -32,8 +37,9 @@ export class AddPlayerComponent {
     };
   }
   resetForm() {
-    this.currentId++;
-    this.addedPlayer = { id: this.currentId, name: '', skillId: 0 };
+    const currentId = this.currentId$.getValue();
+    this.addedPlayer = { id: currentId + 1, name: '', skillId: 0 };
+    this.currentId$.next(currentId + 1);
     this.updateRadioButtons(
       {
         skillLevel: PlayerSkillLevelDesc.Cracked,
