@@ -61,21 +61,9 @@ export class AddPlayerComponent {
     this.skillLevels = this.playerService.getSkillMap();
 
     //testing code
-    const testNames = [
-      'Danny Cai',
-      'Tony He',
-      'Darren Lin',
-      'David La',
-      'Nishamini Gunasinghe',
-      'Kevin Chang',
-      'Jerry Wang',
-    ];
     for (let i = 0; i < 40; i++) {
-      const name = testNames[Math.floor(Math.random() * testNames.length)];
-      console.log(Math.random() * testNames.length);
-      console.log(name);
       const skillId = Math.floor(Math.random() * 5) as any;
-      this.addedPlayer.name = name;
+      this.addedPlayer.name = i.toString();
       this.addedPlayer.skillId = skillId;
       this.addPlayer();
     }
