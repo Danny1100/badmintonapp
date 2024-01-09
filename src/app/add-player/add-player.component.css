@@ -6,3 +6,6 @@
   align-items: center;
   gap: 20px;
 }
+.li-number {
+  width: 20px;
+}

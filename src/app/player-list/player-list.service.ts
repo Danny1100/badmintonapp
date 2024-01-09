@@ -10,14 +10,7 @@ export class PlayerListService {
   playerList$: BehaviorSubject<Player[]> = new BehaviorSubject<Player[]>([]);
   addedPlayer$: ReplaySubject<Player> = new ReplaySubject<Player>();
 
-  constructor() {
-    const testPlayers = [
-      { id: 1, name: 'Danny Cai', skillId: 0 },
-      { id: 2, name: 'Nishamini Gunasingher', skillId: 1 },
-      { id: 3, name: 'Darren Lin', skillId: 2 },
-      { id: 4, name: 'Danny Cai', skillId: 3 },
-    ];
-  }
+  constructor() {}
 
   getCurrentPlayerId() {
     return this.currentPlayerId$;
