@@ -57,7 +57,11 @@ export class AddPlayerComponent {
       alert('Missing player name');
       return;
     }
-    this.playerListService.addPlayer(this.addedPlayer);
+    const formattedPlayer = {
+      ...this.addedPlayer,
+      skillId: Number(this.addedPlayer.skillId),
+    };
+    this.playerListService.addPlayer(formattedPlayer as Player);
     this.resetForm();
   }
 
