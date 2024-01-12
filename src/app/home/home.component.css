@@ -2,6 +2,18 @@
   display: flex;
   gap: 20px;
 }
+.main-container {
+  display: flex;
+}
+.player-list-container {
+  flex: 1;
+}
+.waiting-groups-container {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 .player-list-item {
   display: flex;
   align-items: center;

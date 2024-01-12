@@ -15,6 +15,8 @@ export class HomeComponent {
   waitingPlayers$: BehaviorSubject<Player[]> =
     this.matchmakingService.getWaitingPlayers();
   courts$: BehaviorSubject<Court[]> = this.courtControllerService.getCourts();
+  waitingGroups$: BehaviorSubject<Court[]> =
+    this.matchmakingService.waitingGroups$;
 
   constructor(
     private playerListService: PlayerListService,
