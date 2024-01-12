@@ -61,7 +61,7 @@ export class AddPlayerComponent {
     this.skillLevels = this.playerService.getSkillMap();
 
     //testing code
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 42; i++) {
       const skillId = Math.floor(Math.random() * 5) as any;
       this.addedPlayer.name = i.toString();
       this.addedPlayer.skillId = skillId;

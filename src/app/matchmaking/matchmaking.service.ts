@@ -22,7 +22,7 @@ export class MatchmakingService {
   courtList$: BehaviorSubject<Court[]> =
     this.courtControllerService.getCourts();
   courtList!: Court[];
-  waitingGroups$: ReplaySubject<Court[]> = new ReplaySubject<Court[]>();
+  waitingGroups$: BehaviorSubject<Court[]> = new BehaviorSubject<Court[]>([]);
 
   getWaitingPlayers() {
     return this.waitingPlayers$;
@@ -53,6 +53,7 @@ export class MatchmakingService {
     sortedPlayerQueue.forEach((player) => {
       courtPlayers.push(player);
       count++;
+      // note any players that cannot form a group of 4 will not be added to waitingGroups
       if (count % 4 === 0) {
         waitingGroups.push({
           courtNumber: court.courtNumber,
@@ -83,7 +84,6 @@ export class MatchmakingService {
         foundGroup.players.forEach((p) => visited.add(p.id));
         sortedWaitingGroups.push(foundGroup);
         waitingGroups.splice(foundIndex, 1);
-        console.log(foundGroup.players.map((p) => p.id));
       }
     });
     this.waitingGroups$.next(sortedWaitingGroups);
@@ -98,14 +98,37 @@ export class MatchmakingService {
       this.courtControllerService.updateCourt({ ...court, players: [] });
       return;
     }
-    // if not, run matchmaking algorithm and put them in the court, remove them from the waiting players list
-    // run matchmaking algorithm every time a new player is added from any source
+    // run matchmaking algorithm to calculate waiting groups
     const waitingPlayers = this.waitingPlayers$.getValue();
     if (waitingPlayers.length < 4) {
       alert('Not enough players to matchmake');
       return;
     }
     this.matchmake(court, waitingPlayers);
+    // add first waiting group to court and remove them from waiting group
+    const waitingGroups = this.waitingGroups$.getValue();
+    const nextGroup = waitingGroups.shift();
+    if (!nextGroup) {
+      alert('Error getting next group: no group on waiting group list');
+      return;
+    }
+    const courts = this.courtList$.getValue();
+    const updatedCourts = courts.map((c) => {
+      if (c.courtNumber === court.courtNumber) {
+        return nextGroup;
+      }
+      return c;
+    });
+    this.courtList$.next(updatedCourts);
+    this.waitingGroups$.next(waitingGroups);
+
+    // remove the players from the waiting players list
+    const updatedWaitingPlayers = waitingPlayers.filter((player) => {
+      return !nextGroup.players.find((p) => p.id === player.id);
+    });
+    this.waitingPlayers$.next(updatedWaitingPlayers);
+
+    // TODO: run matchmaking algorithm every time a new player is added from any source
   }
 
   constructor(
