@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { Player } from '../player/services/player.service';
 import { Court } from '../court/court.component';
 import { BehaviorSubject } from 'rxjs';
@@ -23,6 +23,10 @@ export class HomeComponent {
     private courtControllerService: CourtControllerService,
     private matchmakingService: MatchmakingService,
   ) {}
+
+  @HostListener('window:beforeunload', ['$event']) onRefresh(event: Event) {
+    event.returnValue = false;
+  }
 
   removePlayer(playerId: number) {
     this.playerListService.removePlayer(playerId);

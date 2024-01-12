@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import {
   Player,
   PlayerService,
@@ -29,6 +29,10 @@ export class AddPlayerComponent {
     private playerService: PlayerService,
     private playerListService: PlayerListService,
   ) {}
+
+  @HostListener('window:beforeunload', ['$event']) onRefresh(event: Event) {
+    event.returnValue = false;
+  }
 
   getRadioStyle(playerSkillLevel: PlayerSkillData, index: number) {
     return {
@@ -61,13 +65,13 @@ export class AddPlayerComponent {
     this.skillLevels = this.playerService.getSkillMap();
 
     //testing code
-    for (let i = 0; i < 42; i++) {
-      const skillId = Math.floor(Math.random() * 5) as any;
-      this.addedPlayer.name = i.toString();
-      this.addedPlayer.skillId = skillId;
-      this.addPlayer();
-    }
-    this.resetForm();
+    // for (let i = 0; i < 42; i++) {
+    //   const skillId = Math.floor(Math.random() * 5) as any;
+    //   this.addedPlayer.name = i.toString();
+    //   this.addedPlayer.skillId = skillId;
+    //   this.addPlayer();
+    // }
+    // this.resetForm();
   }
   ngAfterViewInit() {
     this.updateRadioButtons(this.skillLevels[0], 0);
