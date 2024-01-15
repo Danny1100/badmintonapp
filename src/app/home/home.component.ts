@@ -17,6 +17,7 @@ export class HomeComponent {
   courts$: BehaviorSubject<Court[]> = this.courtControllerService.getCourts();
   waitingGroups$: BehaviorSubject<Court[]> =
     this.matchmakingService.waitingGroups$;
+  selectedPlayerIds: number[] = [];
 
   constructor(
     private playerListService: PlayerListService,
@@ -31,5 +32,33 @@ export class HomeComponent {
   removePlayer(playerId: number) {
     this.playerListService.removePlayer(playerId);
     this.matchmakingService.removeWaitingPlayer(playerId);
+  }
+  selectPlayer(event: Event, id: number) {
+    const isChecked = (<HTMLInputElement>event.target).checked;
+    if (isChecked) {
+      this.selectedPlayerIds.push(id);
+    } else {
+      this.selectedPlayerIds = this.selectedPlayerIds.filter(
+        (playerId) => playerId !== id,
+      );
+    }
+  }
+  clearSelectedPlayers() {
+    const elements = document.querySelectorAll('.waiting-player-checkbox');
+    elements.forEach((el) => {
+      const element = el as HTMLInputElement;
+      element.checked = false;
+    });
+    this.selectedPlayerIds = [];
+  }
+  addCustomCourt() {
+    const length = this.selectedPlayerIds.length;
+    if (length !== 4) {
+      alert(
+        `Invalid number of selected players. Currently selected ${length} players.`,
+      );
+      return;
+    }
+    this.clearSelectedPlayers();
   }
 }

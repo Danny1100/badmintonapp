@@ -5,6 +5,10 @@
 .main-container {
   display: flex;
 }
+.button-toolbar {
+  display: flex;
+  gap: 20px;
+}
 .player-list-container {
   flex: 1;
 }
@@ -23,6 +27,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.waiting-player-checkbox {
+  transform: scale(1.5);
+  -webkit-transform: scale(1.5);
 }
 .li-number {
   width: 20px;
