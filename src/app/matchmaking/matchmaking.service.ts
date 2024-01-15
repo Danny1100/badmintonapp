@@ -64,6 +64,20 @@ export class MatchmakingService {
     let waitingPlayers = this.waitingPlayers$.getValue();
     waitingPlayers = waitingPlayers.filter((player) => player.id !== playerId);
     this.waitingPlayers$.next(waitingPlayers);
+    const customGroupPlayerIds = this.customGroupPlayerIds$.getValue();
+    if (customGroupPlayerIds.has(playerId)) {
+      const customCourts = this.customGroups$.getValue();
+      const foundCourt = customCourts.find((court) =>
+        court.players.find((player) => player.id === playerId),
+      );
+      if (!foundCourt) {
+        alert(
+          'Error removing player from custom group: could not find custom group player belongs to',
+        );
+        return;
+      }
+      this.removeCustomGroup(foundCourt);
+    }
   }
   matchmake(court: Court, waitingPlayers: Player[]) {
     // use a dictionary to store the number of players in each level
