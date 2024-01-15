@@ -59,9 +59,28 @@ export class HomeComponent {
       );
       return;
     }
+    // check selected players are not already in a custom group
+    const customGroupPlayerIds =
+      this.matchmakingService.customGroupPlayerIds$.getValue();
+    for (let i = 0; i < this.selectedPlayers.length; i++) {
+      const playerId = this.selectedPlayers[i].id;
+      if (customGroupPlayerIds.has(playerId)) {
+        alert(
+          `Invalid group: player with id ${playerId} is already in a custom group.`,
+        );
+        return;
+      }
+    }
+    // add selected players ids to customGroupPlayerIds to ensure they cannot be added again later
+    this.selectedPlayers.forEach((player) =>
+      customGroupPlayerIds.add(player.id),
+    );
+    this.matchmakingService.customGroupPlayerIds$.next(customGroupPlayerIds);
+    // add selected players to custom group
     const customGroups = this.matchmakingService.customGroups$.getValue();
     customGroups.push({ courtNumber: -1, players: this.selectedPlayers });
     this.matchmakingService.customGroups$.next(customGroups);
+
     this.clearSelectedPlayers();
   }
 }

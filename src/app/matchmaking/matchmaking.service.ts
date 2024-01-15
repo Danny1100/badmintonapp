@@ -24,6 +24,9 @@ export class MatchmakingService {
   courtList!: Court[];
   waitingGroups$: BehaviorSubject<Court[]> = new BehaviorSubject<Court[]>([]);
   customGroups$: BehaviorSubject<Court[]> = new BehaviorSubject<Court[]>([]);
+  customGroupPlayerIds$: BehaviorSubject<Set<number>> = new BehaviorSubject<
+    Set<number>
+  >(new Set([]));
 
   constructor(
     private playerListService: PlayerListService,
