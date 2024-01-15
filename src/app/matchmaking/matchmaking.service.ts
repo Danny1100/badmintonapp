@@ -56,6 +56,10 @@ export class MatchmakingService {
     const playerSkillMap = new Map();
     skillLevels.forEach((skillLevelDesc, i) => playerSkillMap.set(i, []));
     waitingPlayers.forEach((player) => {
+      // if player is in custom group, ignore
+      const customGroupPlayerIds = this.customGroupPlayerIds$.getValue();
+      if (customGroupPlayerIds.has(player.id)) return;
+      // else, add player to playerSkillMap
       const { skillId } = player;
       const currentList = playerSkillMap.get(skillId);
       playerSkillMap.set(skillId, [...currentList, player]);
@@ -80,13 +84,19 @@ export class MatchmakingService {
         courtPlayers = [];
       }
     });
+    // add custom groups
+    const customGroups = this.customGroups$.getValue();
+    customGroups.forEach((group) =>
+      waitingGroups.push({
+        courtNumber: court.courtNumber,
+        players: group.players,
+      }),
+    );
     // whoever is highest in the waiting list in each group will determine how early they are in the group queue
     const sortedWaitingGroups: Court[] = [];
     const visited = new Set();
-    let c = 0;
     waitingPlayers.forEach((player) => {
       if (visited.has(player.id)) return;
-      c++;
       let foundIndex = -1;
       for (let i = 0; i < waitingGroups.length; i++) {
         const group = waitingGroups[i];
