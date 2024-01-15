@@ -16,6 +16,7 @@ export interface Court {
 export class CourtComponent {
   @Input({ required: true }) courtNumber!: number;
   @Input({ required: true }) players!: Player[];
+  @Input() showButtons = true;
 
   constructor(
     private courtControllerService: CourtControllerService,

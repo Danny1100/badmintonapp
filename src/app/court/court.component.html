@@ -20,7 +20,7 @@
   </div>
   <hr />
 
-  <div class="footer">
+  <div class="footer" *ngIf="showButtons">
     <button class="btn btn-primary" (click)="cycleCourt()">Next players</button>
     <button class="btn btn-danger" (click)="removeCourt()">Remove Court</button>
   </div>

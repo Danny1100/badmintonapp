@@ -85,7 +85,11 @@
             class="waiting-group-list-item mb-3"
             *ngFor="let group of waitingGroups$ | async; let i = index"
           >
-            <app-court [courtNumber]="-1" [players]="group.players"></app-court>
+            <app-court
+              [courtNumber]="-1"
+              [players]="group.players"
+              [showButtons]="false"
+            ></app-court>
           </div>
         </div>
       </div>
