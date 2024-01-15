@@ -23,6 +23,21 @@ export class MatchmakingService {
     this.courtControllerService.getCourts();
   courtList!: Court[];
   waitingGroups$: BehaviorSubject<Court[]> = new BehaviorSubject<Court[]>([]);
+  customGroups$: BehaviorSubject<Court[]> = new BehaviorSubject<Court[]>([]);
+
+  constructor(
+    private playerListService: PlayerListService,
+    private courtControllerService: CourtControllerService,
+  ) {
+    // whenever a new player is added they are automatically added to the waiting player list
+    this.addedPlayer$.subscribe((player) => {
+      let waitingPlayers = this.waitingPlayers$.getValue();
+      waitingPlayers.push(player);
+      this.waitingPlayers$.next(waitingPlayers);
+    });
+    this.playerList$.subscribe((players) => (this.playerList = players));
+    this.courtList$.subscribe((courts) => (this.courtList = courts));
+  }
 
   getWaitingPlayers() {
     return this.waitingPlayers$;
@@ -129,19 +144,5 @@ export class MatchmakingService {
     this.waitingPlayers$.next(updatedWaitingPlayers);
 
     // TODO: run matchmaking algorithm every time a new player is added from any source
-  }
-
-  constructor(
-    private playerListService: PlayerListService,
-    private courtControllerService: CourtControllerService,
-  ) {
-    // whenever a new player is added they are automatically added to the waiting player list
-    this.addedPlayer$.subscribe((player) => {
-      let waitingPlayers = this.waitingPlayers$.getValue();
-      waitingPlayers.push(player);
-      this.waitingPlayers$.next(waitingPlayers);
-    });
-    this.playerList$.subscribe((players) => (this.playerList = players));
-    this.courtList$.subscribe((courts) => (this.courtList = courts));
   }
 }

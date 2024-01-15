@@ -17,7 +17,7 @@ export class HomeComponent {
   courts$: BehaviorSubject<Court[]> = this.courtControllerService.getCourts();
   waitingGroups$: BehaviorSubject<Court[]> =
     this.matchmakingService.waitingGroups$;
-  selectedPlayerIds: number[] = [];
+  selectedPlayers: Player[] = [];
 
   constructor(
     private playerListService: PlayerListService,
@@ -33,13 +33,13 @@ export class HomeComponent {
     this.playerListService.removePlayer(playerId);
     this.matchmakingService.removeWaitingPlayer(playerId);
   }
-  selectPlayer(event: Event, id: number) {
+  selectPlayer(event: Event, player: Player) {
     const isChecked = (<HTMLInputElement>event.target).checked;
     if (isChecked) {
-      this.selectedPlayerIds.push(id);
+      this.selectedPlayers.push(player);
     } else {
-      this.selectedPlayerIds = this.selectedPlayerIds.filter(
-        (playerId) => playerId !== id,
+      this.selectedPlayers = this.selectedPlayers.filter(
+        (p) => player.id !== p.id,
       );
     }
   }
@@ -49,16 +49,19 @@ export class HomeComponent {
       const element = el as HTMLInputElement;
       element.checked = false;
     });
-    this.selectedPlayerIds = [];
+    this.selectedPlayers = [];
   }
   addCustomCourt() {
-    const length = this.selectedPlayerIds.length;
+    const length = this.selectedPlayers.length;
     if (length !== 4) {
       alert(
         `Invalid number of selected players. Currently selected ${length} players.`,
       );
       return;
     }
+    const customGroups = this.matchmakingService.customGroups$.getValue();
+    customGroups.push({ courtNumber: -1, players: this.selectedPlayers });
+    this.matchmakingService.customGroups$.next(customGroups);
     this.clearSelectedPlayers();
   }
 }
