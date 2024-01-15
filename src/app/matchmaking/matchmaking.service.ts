@@ -45,6 +45,21 @@ export class MatchmakingService {
   getWaitingPlayers() {
     return this.waitingPlayers$;
   }
+  removeCustomGroup(court: Court) {
+    const customGroupPlayerIds = this.customGroupPlayerIds$.getValue();
+    court.players.forEach((player) => {
+      if (customGroupPlayerIds.has(player.id)) {
+        customGroupPlayerIds.delete(player.id);
+      }
+    });
+    this.customGroupPlayerIds$.next(customGroupPlayerIds);
+    const customGroups = this.customGroups$.getValue();
+    const updatedCustomGroups = customGroups.filter(
+      (group) =>
+        !group.players.find((player) => player.id === court.players[0].id),
+    );
+    this.customGroups$.next(updatedCustomGroups);
+  }
   removeWaitingPlayer(playerId: number) {
     let waitingPlayers = this.waitingPlayers$.getValue();
     waitingPlayers = waitingPlayers.filter((player) => player.id !== playerId);
@@ -133,13 +148,16 @@ export class MatchmakingService {
       return;
     }
     this.matchmake(court, waitingPlayers);
-    // add first waiting group to court and remove them from waiting group
+    // get first waiting group
     const waitingGroups = this.waitingGroups$.getValue();
     const nextGroup = waitingGroups.shift();
     if (!nextGroup) {
       alert('Error getting next group: no group on waiting group list');
       return;
     }
+    // if first waiting group is a custom group, remove them from customGroups and customGroupPlayerIds
+    this.removeCustomGroup(nextGroup);
+    // add first waiting group to court and remove them from waiting group
     const courts = this.courtList$.getValue();
     const updatedCourts = courts.map((c) => {
       if (c.courtNumber === court.courtNumber) {
@@ -155,7 +173,5 @@ export class MatchmakingService {
       return !nextGroup.players.find((p) => p.id === player.id);
     });
     this.waitingPlayers$.next(updatedWaitingPlayers);
-
-    // TODO: run matchmaking algorithm every time a new player is added from any source
   }
 }
