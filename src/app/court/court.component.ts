@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Player } from '../player/services/player.service';
 import { CourtControllerService } from '../court-controller/court-controller.service';
 import { MatchmakingService } from '../matchmaking/matchmaking.service';
@@ -17,6 +17,7 @@ export class CourtComponent {
   @Input({ required: true }) courtNumber!: number;
   @Input({ required: true }) players!: Player[];
   @Input() showButtons = true;
+  @Output() onNextCourt = new EventEmitter();
 
   constructor(
     private courtControllerService: CourtControllerService,
@@ -24,6 +25,7 @@ export class CourtComponent {
   ) {}
 
   cycleCourt() {
+    this.onNextCourt.emit();
     this.matchmakingService.cycleCourt({
       courtNumber: this.courtNumber,
       players: this.players,

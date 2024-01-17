@@ -12,6 +12,7 @@
             <app-court
               [courtNumber]="court.courtNumber"
               [players]="court.players"
+              (onNextCourt)="clearSelectedPlayers()"
             ></app-court>
           </div>
         </div>
