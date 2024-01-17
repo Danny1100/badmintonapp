@@ -78,8 +78,12 @@ export class HomeComponent {
     this.matchmakingService.customGroupPlayerIds$.next(customGroupPlayerIds);
     // add selected players to custom group
     const customGroups = this.matchmakingService.customGroups$.getValue();
-    customGroups.push({ courtNumber: -1, players: this.selectedPlayers });
+    const customCourt = { courtNumber: -1, players: this.selectedPlayers };
+    customGroups.push(customCourt);
     this.matchmakingService.customGroups$.next(customGroups);
+    // run matchmaking algorithm to update court queue
+    const waitingPlayers = this.waitingPlayers$.getValue();
+    this.matchmakingService.matchmake(customCourt, waitingPlayers);
 
     this.clearSelectedPlayers();
   }
