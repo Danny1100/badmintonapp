@@ -13,3 +13,6 @@ a:hover {
   color: white;
   background-color: white;
 }
+.navbar-nav a.active {
+  color: #ffbc00;
+}
