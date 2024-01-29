@@ -11,6 +11,7 @@ import { HomeComponent } from './home/home.component';
 import { HeaderComponent } from './header/header.component';
 import { AddPlayerComponent } from './add-player/add-player.component';
 import { AddCourtComponent } from './add-court/add-court.component';
+import { LinkedPlayersComponent } from './linked-players/linked-players.component';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { AddCourtComponent } from './add-court/add-court.component';
     HeaderComponent,
     AddPlayerComponent,
     AddCourtComponent,
+    LinkedPlayersComponent,
   ],
   imports: [
     BrowserModule,

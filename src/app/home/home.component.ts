@@ -87,4 +87,18 @@ export class HomeComponent {
 
     this.clearSelectedPlayers();
   }
+  linkPlayers() {
+    const length = this.selectedPlayers.length;
+    if (length < 2 || length > 4) {
+      alert(
+        `Invalid number of selected players. Currently selected ${length} players.`,
+      );
+      return;
+    }
+    // check players are not already linked
+    // add them to set of linked players so they cannot be added again later
+    // add them to link group
+    // run matchmaking algorithm to update court queue
+    this.clearSelectedPlayers();
+  }
 }
