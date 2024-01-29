@@ -1,10 +1,13 @@
+.navbar-title {
+  color: white;
+}
 li {
   white-space: nowrap;
   padding: 0 30px;
 }
 a,
 a:focus {
-  color: white;
+  color: grey;
 }
 a:hover {
   color: lightblue;
@@ -14,5 +17,5 @@ a:hover {
   background-color: white;
 }
 .navbar-nav a.active {
-  color: #ffbc00;
+  color: white;
 }
