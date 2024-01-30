@@ -1,0 +1,14 @@
+.linked-players {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.linked-players-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.btn-delete {
+  width: 150px;
+  height: 40px;
+}
