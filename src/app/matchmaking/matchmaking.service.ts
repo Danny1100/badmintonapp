@@ -79,7 +79,7 @@ export class MatchmakingService {
       this.removeCustomGroup(foundCourt);
     }
   }
-  matchmake(court: Court, waitingPlayers: Player[]) {
+  matchmake(waitingPlayers: Player[], courtNumber: number = -1) {
     // use a dictionary to store the number of players in each level
     const skillLevels = Object.keys(PlayerSkillLevelDesc);
     const playerSkillMap = new Map();
@@ -107,7 +107,7 @@ export class MatchmakingService {
       // note any players that cannot form a group of 4 will not be added to waitingGroups
       if (count % 4 === 0) {
         waitingGroups.push({
-          courtNumber: court.courtNumber,
+          courtNumber,
           players: courtPlayers,
         });
         courtPlayers = [];
@@ -117,7 +117,7 @@ export class MatchmakingService {
     const customGroups = this.customGroups$.getValue();
     customGroups.forEach((group) =>
       waitingGroups.push({
-        courtNumber: court.courtNumber,
+        courtNumber,
         players: group.players,
       }),
     );
@@ -161,7 +161,7 @@ export class MatchmakingService {
       alert('Not enough players to matchmake');
       return;
     }
-    this.matchmake(court, waitingPlayers);
+    this.matchmake(waitingPlayers, court.courtNumber);
     // get first waiting group
     const waitingGroups = this.waitingGroups$.getValue();
     const nextGroup = waitingGroups.shift();

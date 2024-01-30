@@ -20,6 +20,10 @@ export class HomeComponent {
     this.matchmakingService.waitingGroups$;
   selectedPlayers: Player[] = [];
 
+  // for testing
+  customGroups$ = this.matchmakingService.customGroups$;
+  linkedPlayers$ = this.linkedPlayersService.linkedPlayers$;
+
   constructor(
     private playerListService: PlayerListService,
     private courtControllerService: CourtControllerService,
@@ -85,7 +89,7 @@ export class HomeComponent {
     this.matchmakingService.customGroups$.next(customGroups);
     // run matchmaking algorithm to update court queue
     const waitingPlayers = this.waitingPlayers$.getValue();
-    this.matchmakingService.matchmake(customCourt, waitingPlayers);
+    this.matchmakingService.matchmake(waitingPlayers);
 
     this.clearSelectedPlayers();
   }
@@ -97,27 +101,51 @@ export class HomeComponent {
       );
       return;
     }
-    // check players are not already linked. Also check if players are in a custom group. If so, players to be linked must be in the same custom group
+    // check players are not already linked.
     const linkedPlayerIds =
       this.linkedPlayersService.linkedPlayerIds$.getValue();
-    const customGroupPlayerIds =
-      this.matchmakingService.customGroupPlayerIds$.getValue();
-    const customGroups = this.matchmakingService.customGroups$.getValue();
-    console.log(customGroups);
     for (let i = 0; i < this.selectedPlayers.length; i++) {
       const playerId = this.selectedPlayers[i].id;
       if (linkedPlayerIds.has(playerId)) {
         alert(`Invalid group: player with id ${playerId} is already linked.`);
         return;
       }
-      // TODO!!!
-      if (customGroupPlayerIds.has(playerId)) {
+    }
+    // Check if first player is in a custom group. If so, all players to be linked must be in the same custom group
+    const customGroupPlayerIds =
+      this.matchmakingService.customGroupPlayerIds$.getValue();
+    const customGroups = this.matchmakingService.customGroups$.getValue();
+    const firstPlayerId = this.selectedPlayers[0].id;
+    if (customGroupPlayerIds.has(firstPlayerId)) {
+      const foundGroup = customGroups.find((group) =>
+        group.players.find((player) => player.id === firstPlayerId),
+      );
+      if (!foundGroup) {
+        alert(
+          `Could not find custom group containing player with id ${firstPlayerId}`,
+        );
         return;
       }
+      let invalid = false;
+      this.selectedPlayers.forEach((player) => {
+        if (!foundGroup.players.find((p) => p.id === player.id)) {
+          alert('Not all players to be linked are in the same custom group');
+          invalid = true;
+        }
+      });
+      if (invalid) return;
     }
     // add them to set of linked players so they cannot be added again later
+    this.selectedPlayers.forEach((player) => linkedPlayerIds.add(player.id));
+    this.linkedPlayersService.linkedPlayerIds$.next(linkedPlayerIds);
     // add them to link group
+    const linkedPlayers = this.linkedPlayersService.linkedPlayers$.getValue();
+    linkedPlayers.push(this.selectedPlayers);
+    this.linkedPlayersService.linkedPlayers$.next(linkedPlayers);
     // run matchmaking algorithm to update court queue
+    const waitingPlayers = this.matchmakingService.waitingPlayers$.getValue();
+    this.matchmakingService.matchmake(waitingPlayers);
+
     this.clearSelectedPlayers();
   }
 }

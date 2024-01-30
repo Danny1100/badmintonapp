@@ -6,7 +6,9 @@ import { Player } from 'src/app/player/services/player.service';
   providedIn: 'root',
 })
 export class LinkedPlayersService {
-  linkedPlayers$: BehaviorSubject<Player[]> = new BehaviorSubject<Player[]>([]);
+  linkedPlayers$: BehaviorSubject<Player[][]> = new BehaviorSubject<Player[][]>(
+    [],
+  );
   linkedPlayerIds$: BehaviorSubject<Set<number>> = new BehaviorSubject<
     Set<number>
   >(new Set([]));
