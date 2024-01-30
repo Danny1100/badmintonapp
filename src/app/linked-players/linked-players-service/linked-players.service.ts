@@ -26,4 +26,17 @@ export class LinkedPlayersService {
     );
     this.linkedPlayers$.next(updatedLinkedPlayers);
   }
+  removeLinkedPlayerById(id: number) {
+    const linkedPlayers = this.linkedPlayers$.getValue();
+    const foundGroup = linkedPlayers.find((group) =>
+      group.find((player) => player.id === id),
+    );
+    if (!foundGroup) {
+      alert(
+        `Could not delete linked player group: could not find linked player group containing id ${id}`,
+      );
+      return;
+    }
+    this.removeLinkedPlayers(foundGroup);
+  }
 }

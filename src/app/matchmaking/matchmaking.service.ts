@@ -7,6 +7,7 @@ import {
 import { PlayerListService } from '../player-list/player-list.service';
 import { CourtControllerService } from '../court-controller/court-controller.service';
 import { Court } from '../court/court.component';
+import { LinkedPlayersService } from '../linked-players/linked-players-service/linked-players.service';
 
 @Injectable({
   providedIn: 'root',
@@ -31,6 +32,7 @@ export class MatchmakingService {
   constructor(
     private playerListService: PlayerListService,
     private courtControllerService: CourtControllerService,
+    private linkedPlayersService: LinkedPlayersService,
   ) {
     // whenever a new player is added they are automatically added to the waiting player list
     this.addedPlayer$.subscribe((player) => {
@@ -78,6 +80,7 @@ export class MatchmakingService {
       }
       this.removeCustomGroup(foundCourt);
     }
+    this.linkedPlayersService.removeLinkedPlayerById(playerId);
   }
   matchmake(waitingPlayers: Player[], courtNumber: number = -1) {
     // use a dictionary to store the number of players in each level
