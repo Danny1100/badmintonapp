@@ -5,6 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 import { CourtControllerService } from '../court-controller/court-controller.service';
 import { MatchmakingService } from '../matchmaking/matchmaking.service';
 import { PlayerListService } from '../player-list/player-list.service';
+import { LinkedPlayersService } from '../linked-players/linked-players-service/linked-players.service';
 
 @Component({
   selector: 'app-home',
@@ -23,6 +24,7 @@ export class HomeComponent {
     private playerListService: PlayerListService,
     private courtControllerService: CourtControllerService,
     private matchmakingService: MatchmakingService,
+    private linkedPlayersService: LinkedPlayersService,
   ) {}
 
   @HostListener('window:beforeunload', ['$event']) onRefresh(event: Event) {
@@ -95,7 +97,24 @@ export class HomeComponent {
       );
       return;
     }
-    // check players are not already linked
+    // check players are not already linked. Also check if players are in a custom group. If so, players to be linked must be in the same custom group
+    const linkedPlayerIds =
+      this.linkedPlayersService.linkedPlayerIds$.getValue();
+    const customGroupPlayerIds =
+      this.matchmakingService.customGroupPlayerIds$.getValue();
+    const customGroups = this.matchmakingService.customGroups$.getValue();
+    console.log(customGroups);
+    for (let i = 0; i < this.selectedPlayers.length; i++) {
+      const playerId = this.selectedPlayers[i].id;
+      if (linkedPlayerIds.has(playerId)) {
+        alert(`Invalid group: player with id ${playerId} is already linked.`);
+        return;
+      }
+      // TODO!!!
+      if (customGroupPlayerIds.has(playerId)) {
+        return;
+      }
+    }
     // add them to set of linked players so they cannot be added again later
     // add them to link group
     // run matchmaking algorithm to update court queue
