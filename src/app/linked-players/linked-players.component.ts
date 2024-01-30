@@ -1,5 +1,6 @@
 import { Component, HostListener } from '@angular/core';
 import { LinkedPlayersService } from './linked-players-service/linked-players.service';
+import { Player } from '../player/services/player.service';
 
 @Component({
   selector: 'app-linked-players',
@@ -13,5 +14,9 @@ export class LinkedPlayersComponent {
 
   @HostListener('window:beforeunload', ['$event']) onRefresh(event: Event) {
     event.returnValue = false;
+  }
+
+  removeLinkedPlayers(group: Player[]) {
+    this.linkedPlayersService.removeLinkedPlayers(group);
   }
 }

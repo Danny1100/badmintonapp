@@ -22,7 +22,9 @@
       </div>
       <div class="main-container">
         <div class="player-list-container my-5 mx-3">
+          <h3>Custom groups</h3>
           <p>{{ customGroups$ | async | json }}</p>
+          <h3>Linked Player Groups</h3>
           <p>{{ linkedPlayers$ | async | json }}</p>
           <h2 class="mb-3">Waiting Players</h2>
           <div class="button-toolbar">

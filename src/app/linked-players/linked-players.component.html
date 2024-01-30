@@ -10,7 +10,12 @@
         [players]="group"
         [showButtons]="false"
       ></app-court>
-      <button class="btn btn-danger btn-delete">Delete</button>
+      <button
+        class="btn btn-danger btn-delete"
+        (click)="removeLinkedPlayers(group)"
+      >
+        Delete
+      </button>
     </div>
   </div>
 </div>
