@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, ReplaySubject } from 'rxjs';
+import { BehaviorSubject, ReplaySubject, Subject, takeUntil } from 'rxjs';
 import {
   Player,
   PlayerSkillLevelDesc,
@@ -28,6 +28,7 @@ export class MatchmakingService {
   customGroupPlayerIds$: BehaviorSubject<Set<number>> = new BehaviorSubject<
     Set<number>
   >(new Set([]));
+  ngUnsubscribe$: Subject<boolean> = new Subject();
 
   constructor(
     private playerListService: PlayerListService,
@@ -35,13 +36,19 @@ export class MatchmakingService {
     private linkedPlayersService: LinkedPlayersService,
   ) {
     // whenever a new player is added they are automatically added to the waiting player list
-    this.addedPlayer$.subscribe((player) => {
-      let waitingPlayers = this.waitingPlayers$.getValue();
-      waitingPlayers.push(player);
-      this.waitingPlayers$.next(waitingPlayers);
-    });
-    this.playerList$.subscribe((players) => (this.playerList = players));
-    this.courtList$.subscribe((courts) => (this.courtList = courts));
+    this.addedPlayer$
+      .pipe(takeUntil(this.ngUnsubscribe$))
+      .subscribe((player) => {
+        let waitingPlayers = this.waitingPlayers$.getValue();
+        waitingPlayers.push(player);
+        this.waitingPlayers$.next(waitingPlayers);
+      });
+    this.playerList$
+      .pipe(takeUntil(this.ngUnsubscribe$))
+      .subscribe((players) => (this.playerList = players));
+    this.courtList$
+      .pipe(takeUntil(this.ngUnsubscribe$))
+      .subscribe((courts) => (this.courtList = courts));
   }
 
   getWaitingPlayers() {
@@ -190,5 +197,10 @@ export class MatchmakingService {
       return !nextGroup.players.find((p) => p.id === player.id);
     });
     this.waitingPlayers$.next(updatedWaitingPlayers);
+  }
+
+  ngOnDestroy() {
+    this.ngUnsubscribe$.next(true);
+    this.ngUnsubscribe$.complete();
   }
 }
