@@ -117,8 +117,8 @@ export class MatchmakingService {
     const linkedPlayerGroups = [];
     for (let i = 0; i < linkedPlayers.length; i++) {
       const group = linkedPlayers[i];
-      const playersNeeded = 4 - group.length;
       const currentGroup = group.map((player) => player);
+      const playersNeeded = 4 - group.length;
       for (let j = 0; j < playersNeeded; j++) {
         const targetSkill =
           currentGroup.reduce((acc, player) => acc + player.skillId, 0) /
