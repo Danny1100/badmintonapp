@@ -87,7 +87,11 @@ export class MatchmakingService {
       }
       this.removeCustomGroup(foundCourt);
     }
-    this.linkedPlayersService.removeLinkedPlayerById(playerId);
+    const linkedPlayerIds =
+      this.linkedPlayersService.linkedPlayerIds$.getValue();
+    if (linkedPlayerIds.has(playerId)) {
+      this.linkedPlayersService.removeLinkedPlayerById(playerId);
+    }
   }
   matchmake(waitingPlayers: Player[], courtNumber: number = -1) {
     // use a dictionary to store the number of players in each level
@@ -98,14 +102,50 @@ export class MatchmakingService {
       // if player is in custom group, ignore
       const customGroupPlayerIds = this.customGroupPlayerIds$.getValue();
       if (customGroupPlayerIds.has(player.id)) return;
+      // if player is linked, ignore
+      const linkedPlayerIds =
+        this.linkedPlayersService.linkedPlayerIds$.getValue();
+      if (linkedPlayerIds.has(player.id)) return;
       // else, add player to playerSkillMap
       const { skillId } = player;
       const currentList = playerSkillMap.get(skillId);
       playerSkillMap.set(skillId, [...currentList, player]);
     });
+    // create linked player groups and remove those players from playerSkillMap
+    let playerSkillMapArray = Array.from(playerSkillMap.values());
+    const linkedPlayers = this.linkedPlayersService.linkedPlayers$.getValue();
+    const linkedPlayerGroups = [];
+    for (let i = 0; i < linkedPlayers.length; i++) {
+      const group = linkedPlayers[i];
+      const playersNeeded = 4 - group.length;
+      const currentGroup = group.map((player) => player);
+      for (let j = 0; j < playersNeeded; j++) {
+        const targetSkill =
+          currentGroup.reduce((acc, player) => acc + player.skillId, 0) /
+          currentGroup.length;
+        let foundInfo: any = { player: null, skillDiff: Infinity };
+        playerSkillMapArray.forEach((playerGroup, skillIndex) => {
+          const skillDiff = Math.abs(skillIndex - targetSkill);
+          if (skillDiff < foundInfo.skillDiff && playerGroup.length > 0) {
+            foundInfo = { player: playerGroup[0], skillDiff };
+          }
+        });
+        if (!foundInfo.player) {
+          alert('Error finding player to link');
+          return;
+        }
+        currentGroup.push(foundInfo.player);
+        playerSkillMapArray = playerSkillMapArray.map((playerGroup) =>
+          playerGroup.filter(
+            (player: Player) => player.id !== foundInfo.player.id,
+          ),
+        );
+      }
+      linkedPlayerGroups.push(currentGroup);
+    }
     // group similar skill players together in groups of 4 by iterating through the map
     const sortedPlayerQueue: Player[] = [];
-    Array.from(playerSkillMap.values()).forEach((playerGroup) =>
+    playerSkillMapArray.forEach((playerGroup) =>
       playerGroup.forEach((player: Player) => sortedPlayerQueue.push(player)),
     );
     const waitingGroups: Court[] = [];
@@ -129,6 +169,13 @@ export class MatchmakingService {
       waitingGroups.push({
         courtNumber,
         players: group.players,
+      }),
+    );
+    // add linked player groups
+    linkedPlayerGroups.forEach((group) =>
+      waitingGroups.push({
+        courtNumber,
+        players: group,
       }),
     );
     // whoever is highest in the waiting list in each group will determine how early they are in the group queue
