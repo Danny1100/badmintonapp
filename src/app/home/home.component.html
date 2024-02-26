@@ -21,12 +21,7 @@
         <app-add-court></app-add-court>
       </div>
       <div class="main-container">
-        <div class="player-list-container my-5 mx-3">
-          <h3>Custom groups</h3>
-          <p>{{ customGroups$ | async | json }}</p>
-          <h3>Linked Player Groups</h3>
-          <p>{{ linkedPlayers$ | async | json }}</p>
-          <h2 class="mb-3">Waiting Players</h2>
+        <div class="player-list-container my-3 mx-3">
           <div class="button-toolbar">
             <button
               class="btn btn-primary mb-3 mr-3"
@@ -44,6 +39,9 @@
               Clear Selected Players
             </button>
           </div>
+          <h2 class="mb-3" *ngIf="(waitingPlayers$ | async)?.length">
+            Waiting Players
+          </h2>
           <div
             class="player-list-item mb-3"
             *ngFor="let player of waitingPlayers$ | async; let i = index"
@@ -88,7 +86,9 @@
           </div>
         </div>
         <div class="waiting-groups-container my-5 mx-3">
-          <h2 class="mb-3">Queued Groups</h2>
+          <h2 class="mb-3" *ngIf="(waitingGroups$ | async)?.length">
+            Queued Groups
+          </h2>
           <div
             class="waiting-group-list-item mb-3"
             *ngFor="let group of waitingGroups$ | async; let i = index"
