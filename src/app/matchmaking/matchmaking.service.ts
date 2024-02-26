@@ -93,6 +93,12 @@ export class MatchmakingService {
       this.linkedPlayersService.removeLinkedPlayerById(playerId);
     }
   }
+  shuffleArray(array: any[]) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
   matchmake(waitingPlayers: Player[], courtNumber: number = -1) {
     // use a dictionary to store the number of players in each level
     const skillLevels = Object.keys(PlayerSkillLevelDesc);
@@ -111,6 +117,24 @@ export class MatchmakingService {
       const currentList = playerSkillMap.get(skillId);
       playerSkillMap.set(skillId, [...currentList, player]);
     });
+    // shuffle the order of players in each skill group
+    const playerSkillMapLength = playerSkillMap.size;
+    for (let i = 0; i < playerSkillMapLength; i++) {
+      const playerGroup = playerSkillMap.get(i);
+      if (i == playerSkillMapLength - 1) {
+        /* 
+          Note in the last group we may have players not put into a group if the list of waiting players is not divisible by 4.
+          We want to make sure these players are kept in waiting order so they are not always shuffled into not having a group
+        */
+        const remainder = waitingPlayers.length % 4;
+        const remainderGroup = playerGroup.slice(0, remainder);
+        const fullGroups = playerGroup.slice(remainder);
+        this.shuffleArray(fullGroups);
+        playerSkillMap.set(i, [...remainderGroup, ...fullGroups]);
+      } else {
+        this.shuffleArray(playerGroup);
+      }
+    }
     // create linked player groups and remove those players from playerSkillMap
     let playerSkillMapArray = Array.from(playerSkillMap.values());
     const linkedPlayers = this.linkedPlayersService.linkedPlayers$.getValue();
