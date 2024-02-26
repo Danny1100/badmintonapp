@@ -18,6 +18,7 @@ export class CourtComponent {
   @Input({ required: true }) players!: Player[];
   @Input() showButtons = true;
   @Output() onNextCourt = new EventEmitter();
+  disableNextCourtButton = true;
 
   constructor(
     private courtControllerService: CourtControllerService,
@@ -25,6 +26,7 @@ export class CourtComponent {
   ) {}
 
   cycleCourt() {
+    if (this.disableNextCourtButton) return;
     this.onNextCourt.emit();
     this.matchmakingService.cycleCourt({
       courtNumber: this.courtNumber,
@@ -37,5 +39,10 @@ export class CourtComponent {
       return;
     }
     this.courtControllerService.removeCourt(this.courtNumber);
+  }
+
+  ngOnInit() {
+    // every time you cycle court, a new court component is created, this ensures no accidental double clicks of next court button
+    setTimeout(() => (this.disableNextCourtButton = false), 200);
   }
 }
