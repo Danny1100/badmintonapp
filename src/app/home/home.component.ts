@@ -77,6 +77,40 @@ export class HomeComponent {
         return;
       }
     }
+    // check each linked group to make sure if any selected players are linked, all selected players are in the same linked group
+    const linkedPlayerIds =
+      this.linkedPlayersService.linkedPlayerIds$.getValue();
+    if (this.selectedPlayers.find((player) => linkedPlayerIds.has(player.id))) {
+      const linkedPlayerGroups =
+        this.linkedPlayersService.linkedPlayers$.getValue();
+      const selectedPlayerIds = new Set<number>();
+      this.selectedPlayers.forEach((player) =>
+        selectedPlayerIds.add(player.id),
+      );
+      const foundLinkedPlayerIds = new Set<number>();
+      linkedPlayerGroups.forEach((group) => {
+        group.forEach((player) => {
+          if (selectedPlayerIds.has(player.id)) {
+            group.forEach((p) => foundLinkedPlayerIds.add(p.id));
+          }
+        });
+      });
+      let valid = true;
+      if (foundLinkedPlayerIds.size > selectedPlayerIds.size) {
+        valid = false;
+      }
+      foundLinkedPlayerIds.forEach((id) => {
+        if (!selectedPlayerIds.has(id)) {
+          valid = false;
+        }
+      });
+      if (!valid) {
+        alert(
+          'Invalid group: not all selected players are in linked groups that are compatible',
+        );
+        return;
+      }
+    }
     // add selected players ids to customGroupPlayerIds to ensure they cannot be added again later
     this.selectedPlayers.forEach((player) =>
       customGroupPlayerIds.add(player.id),
