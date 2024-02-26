@@ -13,7 +13,7 @@ export class LinkedPlayersComponent {
   constructor(private linkedPlayersService: LinkedPlayersService) {}
 
   @HostListener('window:beforeunload', ['$event']) onRefresh(event: Event) {
-    event.returnValue = false;
+    event.preventDefault();
   }
 
   removeLinkedPlayers(group: Player[]) {

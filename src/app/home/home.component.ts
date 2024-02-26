@@ -32,7 +32,7 @@ export class HomeComponent {
   ) {}
 
   @HostListener('window:beforeunload', ['$event']) onRefresh(event: Event) {
-    event.returnValue = false;
+    event.preventDefault();
   }
 
   removePlayer(playerId: number) {

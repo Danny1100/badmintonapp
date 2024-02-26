@@ -31,7 +31,7 @@ export class AddPlayerComponent {
   ) {}
 
   @HostListener('window:beforeunload', ['$event']) onRefresh(event: Event) {
-    event.returnValue = false;
+    event.preventDefault();
   }
 
   getRadioStyle(playerSkillLevel: PlayerSkillData, index: number) {
@@ -68,7 +68,7 @@ export class AddPlayerComponent {
   ngOnInit() {
     this.skillLevels = this.playerService.getSkillMap();
 
-    //testing code
+    // testing code
     // for (let i = 0; i < 42; i++) {
     //   const skillId = Math.floor(Math.random() * 5) as any;
     //   this.addedPlayer.name = i.toString();
