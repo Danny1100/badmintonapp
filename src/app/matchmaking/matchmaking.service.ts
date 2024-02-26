@@ -215,6 +215,7 @@ export class MatchmakingService {
     this.waitingGroups$.next(sortedWaitingGroups);
   }
   cycleCourt(court: Court) {
+    let removedPlayersFromCourt = false;
     // if there are players on the court, move them all to the bottom of the waiting players list and update the court list
     if (court.players.length > 0) {
       let waitingPlayers = this.waitingPlayers$.getValue();
@@ -222,7 +223,7 @@ export class MatchmakingService {
       this.waitingPlayers$.next(waitingPlayers);
 
       this.courtControllerService.updateCourt({ ...court, players: [] });
-      return;
+      removedPlayersFromCourt = true;
     }
     // run matchmaking algorithm to calculate waiting groups
     const waitingPlayers = this.waitingPlayers$.getValue();
@@ -231,6 +232,7 @@ export class MatchmakingService {
       return;
     }
     this.matchmake(waitingPlayers, court.courtNumber);
+    if (removedPlayersFromCourt) return;
     // get first waiting group
     const waitingGroups = this.waitingGroups$.getValue();
     const nextGroup = waitingGroups.shift();
