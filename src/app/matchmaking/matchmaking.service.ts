@@ -116,7 +116,19 @@ export class MatchmakingService {
     const linkedPlayers = this.linkedPlayersService.linkedPlayers$.getValue();
     const linkedPlayerGroups = [];
     for (let i = 0; i < linkedPlayers.length; i++) {
+      // if any players in the linked group are in a custom group, ignore the linked group
       const group = linkedPlayers[i];
+      const customGroupPlayerIds = this.customGroupPlayerIds$.getValue();
+      if (group.find((player) => customGroupPlayerIds.has(player.id))) {
+        continue;
+      }
+      // if any players in the linked group are not in the waiting list, ignore the linked group
+      if (
+        group.find((player) => !waitingPlayers.find((p) => p.id === player.id))
+      ) {
+        continue;
+      }
+
       const currentGroup = group.map((player) => player);
       const playersNeeded = 4 - group.length;
       for (let j = 0; j < playersNeeded; j++) {
