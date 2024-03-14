@@ -99,7 +99,7 @@ export class MatchmakingService {
       [array[i], array[j]] = [array[j], array[i]];
     }
   }
-  matchmake(waitingPlayers: Player[], courtNumber: number = -1) {
+  matchmake(waitingPlayers: Player[]) {
     // use a dictionary to store the number of players in each level
     const skillLevels = Object.keys(PlayerSkillLevelDesc);
     const playerSkillMap = new Map();
@@ -187,13 +187,14 @@ export class MatchmakingService {
     const waitingGroups: Court[] = [];
     let courtPlayers: Player[] = [];
     let count = 0;
+    const defaultCourtNumber = -1;
     sortedPlayerQueue.forEach((player) => {
       courtPlayers.push(player);
       count++;
       // note any players that cannot form a group of 4 will not be added to waitingGroups
       if (count % 4 === 0) {
         waitingGroups.push({
-          courtNumber,
+          courtNumber: defaultCourtNumber,
           players: courtPlayers,
         });
         courtPlayers = [];
@@ -203,14 +204,14 @@ export class MatchmakingService {
     const customGroups = this.customGroups$.getValue();
     customGroups.forEach((group) =>
       waitingGroups.push({
-        courtNumber,
+        courtNumber: defaultCourtNumber,
         players: group.players,
       }),
     );
     // add linked player groups
     linkedPlayerGroups.forEach((group) =>
       waitingGroups.push({
-        courtNumber,
+        courtNumber: defaultCourtNumber,
         players: group,
       }),
     );
@@ -239,7 +240,6 @@ export class MatchmakingService {
     this.waitingGroups$.next(sortedWaitingGroups);
   }
   cycleCourt(court: Court) {
-    let removedPlayersFromCourt = false;
     // if there are players on the court, move them all to the bottom of the waiting players list and update the court list
     if (court.players.length > 0) {
       let waitingPlayers = this.waitingPlayers$.getValue();
@@ -247,16 +247,17 @@ export class MatchmakingService {
       this.waitingPlayers$.next(waitingPlayers);
 
       this.courtControllerService.updateCourt({ ...court, players: [] });
-      removedPlayersFromCourt = true;
-    }
-    // run matchmaking algorithm to calculate waiting groups
-    const waitingPlayers = this.waitingPlayers$.getValue();
-    if (waitingPlayers.length < 4) {
-      alert('Not enough players to matchmake');
       return;
     }
-    this.matchmake(waitingPlayers, court.courtNumber);
-    if (removedPlayersFromCourt) return;
+    // run matchmaking algorithm to calculate waiting groups if waiting groups length is 0
+    let waitingPlayers = this.waitingPlayers$.getValue();
+    if (this.waitingGroups$.getValue().length === 0) {
+      if (waitingPlayers.length < 4) {
+        alert('Not enough players to matchmake');
+        return;
+      }
+      this.matchmake(waitingPlayers);
+    }
     // get first waiting group
     const waitingGroups = this.waitingGroups$.getValue();
     const nextGroup = waitingGroups.shift();
@@ -270,7 +271,10 @@ export class MatchmakingService {
     const courts = this.courtList$.getValue();
     const updatedCourts = courts.map((c) => {
       if (c.courtNumber === court.courtNumber) {
-        return nextGroup;
+        return {
+          ...nextGroup,
+          courtNumber: court.courtNumber,
+        };
       }
       return c;
     });
@@ -282,6 +286,16 @@ export class MatchmakingService {
       return !nextGroup.players.find((p) => p.id === player.id);
     });
     this.waitingPlayers$.next(updatedWaitingPlayers);
+
+    // run matchmaking algorithm to calculate waiting groups if waiting groups length is 0
+    waitingPlayers = this.waitingPlayers$.getValue();
+    if (this.waitingGroups$.getValue().length === 0) {
+      if (waitingPlayers.length < 4) {
+        alert('Not enough players to matchmake');
+        return;
+      }
+      this.matchmake(waitingPlayers);
+    }
   }
 
   ngOnDestroy() {
