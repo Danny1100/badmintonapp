@@ -3,12 +3,13 @@ import { Injectable } from '@angular/core';
 export interface Player {
   id: number;
   name: string;
-  skillId: 0 | 1 | 2 | 3 | 4;
+  skillId: number;
 }
 export enum PlayerSkillLevelDesc {
   Cracked = 'cracked',
   Strong = 'strong',
   Good = 'good',
+  Average = 'average',
   Amateur = 'amateur',
   New = 'new',
 }
@@ -16,8 +17,9 @@ export enum PlayerSkillLevelColour {
   Cracked = '#f30da9',
   Strong = '#f30d0d',
   Good = '#f3af0d',
-  Amateur = '#0db2f3',
-  New = '#e1f30d',
+  Average = '#0db2f3',
+  Amateur = '#36c513',
+  New = '#ffaaea',
 }
 export interface PlayerSkillData {
   skillLevel: PlayerSkillLevelDesc;
@@ -41,6 +43,10 @@ export class PlayerService {
     {
       skillLevel: PlayerSkillLevelDesc.Good,
       colour: PlayerSkillLevelColour.Good,
+    },
+    {
+      skillLevel: PlayerSkillLevelDesc.Average,
+      colour: PlayerSkillLevelColour.Average,
     },
     {
       skillLevel: PlayerSkillLevelDesc.Amateur,
