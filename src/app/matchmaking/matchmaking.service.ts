@@ -297,6 +297,20 @@ export class MatchmakingService {
       this.matchmake(waitingPlayers);
     }
   }
+  undoCourt(court: Court) {
+    this.courtControllerService.updateCourt({ ...court, players: [] });
+
+    let waitingPlayers = this.waitingPlayers$.getValue();
+    court.players.forEach((player) => waitingPlayers.unshift(player));
+    this.waitingPlayers$.next(waitingPlayers);
+
+    const waitingGroups = this.waitingGroups$.getValue();
+    waitingGroups.unshift({
+      courtNumber: -1,
+      players: court.players,
+    });
+    this.waitingGroups$.next(waitingGroups);
+  }
 
   ngOnDestroy() {
     this.ngUnsubscribe$.next(true);
