@@ -6,7 +6,12 @@ import { Court } from '../court/court.component';
   providedIn: 'root',
 })
 export class CourtControllerService {
-  courts$: BehaviorSubject<Court[]> = new BehaviorSubject<Court[]>([]);
+  courts$: BehaviorSubject<Court[]> = new BehaviorSubject<Court[]>([
+    { courtNumber: 1, players: [] },
+    { courtNumber: 2, players: [] },
+    { courtNumber: 3, players: [] },
+    { courtNumber: 4, players: [] },
+  ]);
 
   constructor() {}
 
