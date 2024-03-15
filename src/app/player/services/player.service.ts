@@ -6,12 +6,12 @@ export interface Player {
   skillId: number;
 }
 export enum PlayerSkillLevelDesc {
-  Cracked = 'cracked',
-  Strong = 'strong',
-  Good = 'good',
-  Average = 'average',
-  Amateur = 'amateur',
-  New = 'new',
+  Cracked = 'Cracked',
+  Strong = 'Strong',
+  Good = 'Good',
+  Average = 'Average',
+  Amateur = 'Amateur',
+  New = 'New',
 }
 export enum PlayerSkillLevelColour {
   Cracked = '#f30da9',

@@ -34,12 +34,18 @@ export class AddPlayerComponent {
     event.preventDefault();
   }
 
-  getRadioStyle(playerSkillLevel: PlayerSkillData, index: number) {
+  getRadioStyle(playerSkillLevel: PlayerSkillData) {
     return {
       width: '150px',
       border: `1px solid ${playerSkillLevel.colour}`,
     };
   }
+
+  addPlayersFromFile() {
+    if (confirm('Are you sure you want to add players from file?')) {
+    }
+  }
+
   resetForm() {
     const currentId = this.currentId$.getValue();
     this.addedPlayer = { id: currentId + 1, name: '', skillId: 0 };
@@ -69,7 +75,7 @@ export class AddPlayerComponent {
     this.skillLevels = this.playerService.getSkillMap();
 
     // testing code
-    for (let i = 0; i < 42; i++) {
+    for (let i = 0; i < 10; i++) {
       const skillId = Math.floor(
         Math.random() * Object.keys(PlayerSkillLevelDesc).length,
       );
