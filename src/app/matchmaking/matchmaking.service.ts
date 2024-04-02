@@ -290,10 +290,7 @@ export class MatchmakingService {
     // run matchmaking algorithm to calculate waiting groups if waiting groups length is 0
     waitingPlayers = this.waitingPlayers$.getValue();
     if (this.waitingGroups$.getValue().length === 0) {
-      if (waitingPlayers.length < 4) {
-        alert('Not enough players to matchmake');
-        return;
-      }
+      if (waitingPlayers.length < 4) return;
       this.matchmake(waitingPlayers);
     }
   }
