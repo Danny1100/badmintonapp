@@ -8,6 +8,7 @@ import {
 } from '../player/services/player.service';
 import { BehaviorSubject } from 'rxjs';
 import { PlayerListService } from '../player-list/player-list.service';
+import { parse } from 'papaparse';
 
 @Component({
   selector: 'app-add-player',
@@ -43,6 +44,26 @@ export class AddPlayerComponent {
 
   addPlayersFromFile() {
     if (confirm('Are you sure you want to add players from file?')) {
+      fetch('assets/players.csv')
+        .then((res) => res.text())
+        .then((data) => {
+          const players = parse<{ Name: string; 'Skill Level': string }>(data, {
+            header: true,
+          }).data.map((player) => ({
+            name: player.Name,
+            skillId: Object.keys(PlayerSkillLevelDesc).indexOf(
+              player['Skill Level'],
+            ),
+          }));
+          players.forEach((player) => {
+            if (!player.name || player.skillId < 0) return;
+            this.addedPlayer = {
+              ...this.addedPlayer,
+              ...player,
+            };
+            this.addPlayer();
+          });
+        });
     }
   }
 
@@ -67,7 +88,7 @@ export class AddPlayerComponent {
       ...this.addedPlayer,
       skillId: Number(this.addedPlayer.skillId),
     };
-    this.playerListService.addPlayer(formattedPlayer as Player);
+    this.playerListService.addPlayer(formattedPlayer);
     this.resetForm();
   }
 
