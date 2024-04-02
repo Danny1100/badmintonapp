@@ -94,17 +94,6 @@ export class AddPlayerComponent {
 
   ngOnInit() {
     this.skillLevels = this.playerService.getSkillMap();
-
-    // testing code
-    for (let i = 0; i < 10; i++) {
-      const skillId = Math.floor(
-        Math.random() * Object.keys(PlayerSkillLevelDesc).length,
-      );
-      this.addedPlayer.name = i.toString();
-      this.addedPlayer.skillId = skillId;
-      this.addPlayer();
-    }
-    this.resetForm();
   }
   ngAfterViewInit() {
     this.updateRadioButtons(this.skillLevels[0], 0);
