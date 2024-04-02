@@ -49,6 +49,21 @@ export class MatchmakingService {
     this.courtList$
       .pipe(takeUntil(this.ngUnsubscribe$))
       .subscribe((courts) => (this.courtList = courts));
+    // check there are no duplicate players in waiting groups
+    this.waitingGroups$
+      .pipe(takeUntil(this.ngUnsubscribe$))
+      .subscribe((courts) => {
+        const waitingGroupPlayers = new Set<number>();
+        courts.forEach((court) => {
+          court.players.forEach((player) => {
+            if (waitingGroupPlayers.has(player.id)) {
+              throw new Error('Player is in multiple waiting groups');
+            } else {
+              waitingGroupPlayers.add(player.id);
+            }
+          });
+        });
+      });
   }
 
   getWaitingPlayers() {
