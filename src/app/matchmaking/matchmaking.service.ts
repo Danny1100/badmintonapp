@@ -28,6 +28,9 @@ export class MatchmakingService {
   customGroupPlayerIds$: BehaviorSubject<Set<number>> = new BehaviorSubject<
     Set<number>
   >(new Set([]));
+  waitingDuration$: BehaviorSubject<
+    Map<number, { player: Player; waitPeriod: number }>
+  > = new BehaviorSubject(new Map());
   ngUnsubscribe$: Subject<boolean> = new Subject();
 
   constructor(
@@ -264,7 +267,7 @@ export class MatchmakingService {
       this.courtControllerService.updateCourt({ ...court, players: [] });
       return;
     }
-    // run matchmaking algorithm to calculate waiting groups if waiting groups length is 0
+    // if waiting groups length is 0, run matchmaking algorithm to calculate waiting groups
     let waitingPlayers = this.waitingPlayers$.getValue();
     if (this.waitingGroups$.getValue().length === 0) {
       if (waitingPlayers.length < 4) {
@@ -297,16 +300,31 @@ export class MatchmakingService {
     this.waitingGroups$.next(waitingGroups);
 
     // remove the players from the waiting players list
-    const updatedWaitingPlayers = waitingPlayers.filter((player) => {
+    const newWaitingPlayers = waitingPlayers.filter((player) => {
       return !nextGroup.players.find((p) => p.id === player.id);
     });
-    this.waitingPlayers$.next(updatedWaitingPlayers);
+    this.waitingPlayers$.next(newWaitingPlayers);
 
-    // run matchmaking algorithm to calculate waiting groups if waiting groups length is 0
-    waitingPlayers = this.waitingPlayers$.getValue();
+    // update waiting duration for each player
+    const updatedWaitingPlayers = this.waitingPlayers$.getValue();
+    const waitingDuration = this.waitingDuration$.getValue();
+    updatedWaitingPlayers.forEach((player) => {
+      if (waitingDuration.has(player.id)) {
+        const { waitPeriod } = waitingDuration.get(player.id) as {
+          player: Player;
+          waitPeriod: number;
+        };
+        waitingDuration.set(player.id, { player, waitPeriod: waitPeriod + 1 });
+      } else {
+        waitingDuration.set(player.id, { player, waitPeriod: 1 });
+      }
+    });
+    this.waitingDuration$.next(waitingDuration);
+
+    // if waiting groups length is 0, run matchmaking algorithm to calculate waiting groups
     if (this.waitingGroups$.getValue().length === 0) {
-      if (waitingPlayers.length < 4) return;
-      this.matchmake(waitingPlayers);
+      if (updatedWaitingPlayers.length < 4) return;
+      this.matchmake(updatedWaitingPlayers);
     }
   }
   undoCourt(court: Court) {
