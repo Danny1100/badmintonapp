@@ -12,6 +12,7 @@ import { HeaderComponent } from './header/header.component';
 import { AddPlayerComponent } from './add-player/add-player.component';
 import { AddCourtComponent } from './add-court/add-court.component';
 import { LinkedPlayersComponent } from './linked-players/linked-players.component';
+import { WaitDurationComponent } from './wait-duration/wait-duration.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { LinkedPlayersComponent } from './linked-players/linked-players.componen
     AddPlayerComponent,
     AddCourtComponent,
     LinkedPlayersComponent,
+    WaitDurationComponent,
   ],
   imports: [
     BrowserModule,
