@@ -139,22 +139,10 @@ export class MatchmakingService {
     const playerSkillMapLength = playerSkillMap.size;
     for (let i = 0; i < playerSkillMapLength; i++) {
       const playerGroup = playerSkillMap.get(i);
-      if (i == playerSkillMapLength - 1) {
-        /* 
-          Note in the last group we may have players not put into a group if the list of waiting players is not divisible by 4.
-          We want to make sure these players are kept in waiting order so they are not always shuffled into not having a group
-        */
-        const remainder = waitingPlayers.length % 4;
-        const remainderGroup = playerGroup.slice(0, remainder);
-        const fullGroups = playerGroup.slice(remainder);
-        this.shuffleArray(fullGroups);
-        playerSkillMap.set(i, [...remainderGroup, ...fullGroups]);
-      } else {
-        this.shuffleArray(playerGroup);
-      }
+      this.shuffleArray(playerGroup);
     }
     // create linked player groups and remove those players from playerSkillMap
-    let playerSkillMapArray = Array.from(playerSkillMap.values());
+    let playerSkillMapArray: Player[][] = Array.from(playerSkillMap.values());
     const linkedPlayers = this.linkedPlayersService.linkedPlayers$.getValue();
     const linkedPlayerGroups = [];
     for (let i = 0; i < linkedPlayers.length; i++) {
@@ -196,6 +184,36 @@ export class MatchmakingService {
         );
       }
       linkedPlayerGroups.push(currentGroup);
+    }
+    // remove people who have waited the least from the skill map array so that it is a multiple of 4 - this is to ensure people who have waited longer will always be put into a group
+    let playerSkillMapArrayLength = 0;
+    playerSkillMapArray.forEach(
+      (playerGroup) => (playerSkillMapArrayLength += playerGroup.length),
+    );
+    const toRemove = playerSkillMapArrayLength % 4;
+    for (let i = 0; i < toRemove; i++) {
+      let shortestWaitIndex = -1;
+      let shortestWaitInfo: {
+        skillMapIndex: number;
+        playerGroupIndex: number;
+      } | null = null;
+      playerSkillMapArray.forEach((playerGroup, skillMapIndex) => {
+        playerGroup.forEach((player, playerGroupIndex) => {
+          const foundIndex = waitingPlayers.findIndex(
+            (p) => p.id === player.id,
+          );
+          if (foundIndex > shortestWaitIndex) {
+            shortestWaitIndex = foundIndex;
+            shortestWaitInfo = { skillMapIndex, playerGroupIndex };
+          }
+        });
+      });
+      if (!shortestWaitInfo) {
+        alert('Error finding player who has waited the least');
+        return;
+      }
+      const { skillMapIndex, playerGroupIndex } = shortestWaitInfo;
+      playerSkillMapArray[skillMapIndex].splice(playerGroupIndex, 1);
     }
     // group similar skill players together in groups of 4 by iterating through the map
     const sortedPlayerQueue: Player[] = [];
