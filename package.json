@@ -20,7 +20,7 @@
     "@angular/router": "^17.3.12",
     "@popperjs/core": "^2.11.8",
     "bootstrap": "^5.2.3",
-    "ngx-bootstrap": "^11.0.2",
+    "ngx-bootstrap": "^12.0.0",
     "papaparse": "^5.4.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
