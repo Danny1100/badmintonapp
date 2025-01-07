@@ -5,24 +5,29 @@
   <hr />
 
   <div class="players">
-    <div *ngIf="players.length > 0; else noPlayers">
-      <div class="my-2" *ngFor="let player of players">
-        <app-player
-          [id]="player.id"
-          [name]="player.name"
-          [skillId]="player.skillId"
-        ></app-player>
+    @if (players.length > 0) {
+      <div>
+        @for (player of players; track player) {
+          <div class="my-2">
+            <app-player
+              [id]="player.id"
+              [name]="player.name"
+              [skillId]="player.skillId"
+            ></app-player>
+          </div>
+        }
       </div>
-    </div>
-    <ng-template #noPlayers>
+    } @else {
       <p>No players</p>
-    </ng-template>
+    }
   </div>
   <hr />
 
-  <div class="footer" *ngIf="showButtons">
-    <button class="btn btn-primary" (click)="cycleCourt()">Next</button>
-    <button class="btn btn-secondary" (click)="undo()">Undo</button>
-    <button class="btn btn-danger" (click)="removeCourt()">Remove Court</button>
-  </div>
+  @if (showButtons) {
+    <div class="footer">
+      <button class="btn btn-primary" (click)="cycleCourt()">Next</button>
+      <button class="btn btn-secondary" (click)="undo()">Undo</button>
+      <button class="btn btn-danger" (click)="removeCourt()">Remove Court</button>
+    </div>
+  }
 </div>

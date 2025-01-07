@@ -1,21 +1,22 @@
 <div class="container-fluid p-3">
   <h2 class="mb-3">Linked Players</h2>
-  <div
-    class="linked-players mb-3"
-    *ngFor="let group of linkedPlayers$ | async; let i = index"
-  >
-    <div class="linked-players-item">
-      <app-court
-        [courtNumber]="-1"
-        [players]="group"
-        [showButtons]="false"
-      ></app-court>
-      <button
-        class="btn btn-danger btn-delete"
-        (click)="removeLinkedPlayers(group)"
+  @for (group of linkedPlayers$ | async; track group; let i = $index) {
+    <div
+      class="linked-players mb-3"
       >
-        Delete
-      </button>
+      <div class="linked-players-item">
+        <app-court
+          [courtNumber]="-1"
+          [players]="group"
+          [showButtons]="false"
+        ></app-court>
+        <button
+          class="btn btn-danger btn-delete"
+          (click)="removeLinkedPlayers(group)"
+          >
+          Delete
+        </button>
+      </div>
     </div>
-  </div>
+  }
 </div>

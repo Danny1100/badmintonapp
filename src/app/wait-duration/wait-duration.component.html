@@ -1,16 +1,17 @@
 <div class="container-fluid p-3">
   <h2 class="mb-3">Wait Duration</h2>
-  <div
-    class="wait-duration-container mb-3"
-    *ngFor="let data of waitDuration$ | async | keyvalue; let i = index"
-  >
-    <div class="wait-duration-item">
-      <app-player
-        [id]="data.value.player.id"
-        [name]="data.value.player.name"
-        [skillId]="data.value.player.skillId"
-      ></app-player>
-      <p>{{ data.value.waitPeriod }}</p>
+  @for (data of waitDuration$ | async | keyvalue; track data; let i = $index) {
+    <div
+      class="wait-duration-container mb-3"
+      >
+      <div class="wait-duration-item">
+        <app-player
+          [id]="data.value.player.id"
+          [name]="data.value.player.name"
+          [skillId]="data.value.player.skillId"
+        ></app-player>
+        <p>{{ data.value.waitPeriod }}</p>
+      </div>
     </div>
-  </div>
+  }
 </div>

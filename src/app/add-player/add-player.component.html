@@ -9,59 +9,61 @@
           id="playerName"
           name="playerName"
           [(ngModel)]="addedPlayer.name"
-        />
-      </div>
-      <div class="mb-4">
-        <label for="playerSkillId" class="form-label">Player Skill Level</label>
-        <br />
-        <div
-          id="playerSkillId"
-          class="btn-group"
-          role="group"
-          *ngFor="let lvl of skillLevels; let i = index"
-        >
-          <div class="mx-3">
-            <input
-              type="radio"
-              class="btn-check form-control"
-              name="player-skill-level"
-              id="{{ i }}"
-              autocomplete="off"
-              [(ngModel)]="addedPlayer.skillId"
-              value="{{ i }}"
-              (change)="updateRadioButtons(lvl, i)"
-            />
-            <label
-              class="btn player-skill-level-label"
-              for="{{ i }}"
-              [ngStyle]="getRadioStyle(lvl)"
-              >{{ lvl.skillLevel }}</label
-            >
-          </div>
+          />
+        </div>
+        <div class="mb-4">
+          <label for="playerSkillId" class="form-label">Player Skill Level</label>
+          <br />
+          @for (lvl of skillLevels; track lvl; let i = $index) {
+            <div
+              id="playerSkillId"
+              class="btn-group"
+              role="group"
+              >
+              <div class="mx-3">
+                <input
+                  type="radio"
+                  class="btn-check form-control"
+                  name="player-skill-level"
+                  id="{{ i }}"
+                  autocomplete="off"
+                  [(ngModel)]="addedPlayer.skillId"
+                  value="{{ i }}"
+                  (change)="updateRadioButtons(lvl, i)"
+                  />
+                  <label
+                    class="btn player-skill-level-label"
+                    for="{{ i }}"
+                    [ngStyle]="getRadioStyle(lvl)"
+                    >{{ lvl.skillLevel }}</label
+                    >
+                  </div>
+                </div>
+              }
+            </div>
+            <div class="button-toolbar">
+              <button type="submit" class="btn btn-primary" (click)="addPlayer()">
+                Add player
+              </button>
+              <button class="btn btn-secondary" (click)="addPlayersFromFile()">
+                Add players from file
+              </button>
+            </div>
+          </form>
+        </div>
+        <div class="player-list-container my-5 mx-3">
+          <h2 class="mb-3">Current Player List</h2>
+          @for (player of playerList$ | async; track player; let i = $index) {
+            <div
+              class="player-list-item mb-3"
+              >
+              <span class="li-number">{{ i + 1 }}. </span>
+              <app-player
+                [id]="player.id"
+                [name]="player.name"
+                [skillId]="player.skillId"
+              ></app-player>
+            </div>
+          }
         </div>
       </div>
-      <div class="button-toolbar">
-        <button type="submit" class="btn btn-primary" (click)="addPlayer()">
-          Add player
-        </button>
-        <button class="btn btn-secondary" (click)="addPlayersFromFile()">
-          Add players from file
-        </button>
-      </div>
-    </form>
-  </div>
-  <div class="player-list-container my-5 mx-3">
-    <h2 class="mb-3">Current Player List</h2>
-    <div
-      class="player-list-item mb-3"
-      *ngFor="let player of playerList$ | async; let i = index"
-    >
-      <span class="li-number">{{ i + 1 }}. </span>
-      <app-player
-        [id]="player.id"
-        [name]="player.name"
-        [skillId]="player.skillId"
-      ></app-player>
-    </div>
-  </div>
-</div>
