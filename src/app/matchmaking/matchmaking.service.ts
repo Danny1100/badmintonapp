@@ -24,10 +24,6 @@ export class MatchmakingService {
     this.courtControllerService.getCourts();
   courtList!: Court[];
   waitingGroups$: BehaviorSubject<Court[]> = new BehaviorSubject<Court[]>([]);
-  customGroups$: BehaviorSubject<Court[]> = new BehaviorSubject<Court[]>([]);
-  customGroupPlayerIds$: BehaviorSubject<Set<number>> = new BehaviorSubject<
-    Set<number>
-  >(new Set([]));
   waitingDuration$: BehaviorSubject<
     Map<number, { player: Player; waitPeriod: number }>
   > = new BehaviorSubject(new Map());
@@ -72,39 +68,10 @@ export class MatchmakingService {
   getWaitingPlayers() {
     return this.waitingPlayers$;
   }
-  removeCustomGroup(court: Court) {
-    const customGroupPlayerIds = this.customGroupPlayerIds$.getValue();
-    court.players.forEach((player) => {
-      if (customGroupPlayerIds.has(player.id)) {
-        customGroupPlayerIds.delete(player.id);
-      }
-    });
-    this.customGroupPlayerIds$.next(customGroupPlayerIds);
-    const customGroups = this.customGroups$.getValue();
-    const updatedCustomGroups = customGroups.filter(
-      (group) =>
-        !group.players.find((player) => player.id === court.players[0].id),
-    );
-    this.customGroups$.next(updatedCustomGroups);
-  }
   removeWaitingPlayer(playerId: number) {
     let waitingPlayers = this.waitingPlayers$.getValue();
     waitingPlayers = waitingPlayers.filter((player) => player.id !== playerId);
     this.waitingPlayers$.next(waitingPlayers);
-    const customGroupPlayerIds = this.customGroupPlayerIds$.getValue();
-    if (customGroupPlayerIds.has(playerId)) {
-      const customCourts = this.customGroups$.getValue();
-      const foundCourt = customCourts.find((court) =>
-        court.players.find((player) => player.id === playerId),
-      );
-      if (!foundCourt) {
-        alert(
-          'Error removing player from custom group: could not find custom group player belongs to',
-        );
-        return;
-      }
-      this.removeCustomGroup(foundCourt);
-    }
     const linkedPlayerIds =
       this.linkedPlayersService.linkedPlayerIds$.getValue();
     if (linkedPlayerIds.has(playerId)) {
@@ -123,9 +90,6 @@ export class MatchmakingService {
     const playerSkillMap = new Map();
     skillLevels.forEach((skillLevelDesc, i) => playerSkillMap.set(i, []));
     waitingPlayers.forEach((player) => {
-      // if player is in custom group, ignore
-      const customGroupPlayerIds = this.customGroupPlayerIds$.getValue();
-      if (customGroupPlayerIds.has(player.id)) return;
       // if player is linked, ignore
       const linkedPlayerIds =
         this.linkedPlayersService.linkedPlayerIds$.getValue();
@@ -146,13 +110,8 @@ export class MatchmakingService {
     const linkedPlayers = this.linkedPlayersService.linkedPlayers$.getValue();
     const linkedPlayerGroups = [];
     for (let i = 0; i < linkedPlayers.length; i++) {
-      // if any players in the linked group are in a custom group, ignore the linked group
-      const group = linkedPlayers[i];
-      const customGroupPlayerIds = this.customGroupPlayerIds$.getValue();
-      if (group.find((player) => customGroupPlayerIds.has(player.id))) {
-        continue;
-      }
       // if any players in the linked group are not in the waiting list, ignore the linked group
+      const group = linkedPlayers[i];
       if (
         group.find((player) => !waitingPlayers.find((p) => p.id === player.id))
       ) {
@@ -236,14 +195,6 @@ export class MatchmakingService {
         courtPlayers = [];
       }
     });
-    // add custom groups
-    const customGroups = this.customGroups$.getValue();
-    customGroups.forEach((group) =>
-      waitingGroups.push({
-        courtNumber: defaultCourtNumber,
-        players: group.players,
-      }),
-    );
     // add linked player groups
     linkedPlayerGroups.forEach((group) =>
       waitingGroups.push({
@@ -301,8 +252,6 @@ export class MatchmakingService {
       alert('Error getting next group: no group on waiting group list');
       return;
     }
-    // if first waiting group is a custom group, remove them from customGroups and customGroupPlayerIds
-    this.removeCustomGroup(nextGroup);
     // add first waiting group to court and remove them from waiting group
     const courts = this.courtList$.getValue();
     const updatedCourts = courts.map((c) => {
