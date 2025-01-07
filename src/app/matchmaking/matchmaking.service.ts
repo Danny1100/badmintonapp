@@ -236,6 +236,7 @@ export class MatchmakingService {
       this.courtControllerService.updateCourt({ ...court, players: [] });
       return;
     }
+
     // if waiting groups length is 0, run matchmaking algorithm to calculate waiting groups
     let waitingPlayers = this.waitingPlayers$.getValue();
     if (this.waitingGroups$.getValue().length === 0) {
@@ -287,12 +288,6 @@ export class MatchmakingService {
       }
     });
     this.waitingDuration$.next(waitingDuration);
-
-    // if waiting groups length is 0, run matchmaking algorithm to calculate waiting groups
-    if (this.waitingGroups$.getValue().length === 0) {
-      if (updatedWaitingPlayers.length < 4) return;
-      this.matchmake(updatedWaitingPlayers);
-    }
   }
   undoCourt(court: Court) {
     this.courtControllerService.updateCourt({ ...court, players: [] });
