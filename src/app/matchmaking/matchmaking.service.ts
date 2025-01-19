@@ -23,7 +23,10 @@ export class MatchmakingService {
   courtList$: BehaviorSubject<Court[]> =
     this.courtControllerService.getCourts();
   courtList!: Court[];
-  waitingGroups$: BehaviorSubject<Court[]> = new BehaviorSubject<Court[]>([]);
+  matchmakingQueuedPlayers$: BehaviorSubject<Player[]> = new BehaviorSubject<
+    Player[]
+  >([]);
+
   waitingDuration$: BehaviorSubject<
     Map<number, { player: Player; waitPeriod: number }>
   > = new BehaviorSubject(new Map());
@@ -48,19 +51,17 @@ export class MatchmakingService {
     this.courtList$
       .pipe(takeUntil(this.ngUnsubscribe$))
       .subscribe((courts) => (this.courtList = courts));
-    // check there are no duplicate players in waiting groups
-    this.waitingGroups$
+    // check there are no duplicate players in matchmaking queue
+    this.matchmakingQueuedPlayers$
       .pipe(takeUntil(this.ngUnsubscribe$))
-      .subscribe((courts) => {
-        const waitingGroupPlayers = new Set<number>();
-        courts.forEach((court) => {
-          court.players.forEach((player) => {
-            if (waitingGroupPlayers.has(player.id)) {
-              throw new Error('Player is in multiple waiting groups');
-            } else {
-              waitingGroupPlayers.add(player.id);
-            }
-          });
+      .subscribe((players) => {
+        const matchmakingQueuedPlayers = new Set<number>();
+        players.forEach((player) => {
+          if (matchmakingQueuedPlayers.has(player.id)) {
+            throw new Error('Player is in matchmaking queue more than once');
+          } else {
+            matchmakingQueuedPlayers.add(player.id);
+          }
         });
       });
   }
@@ -87,8 +88,8 @@ export class MatchmakingService {
   matchmake(waitingPlayers: Player[]) {
     // use a dictionary to store the number of players in each level
     const skillLevels = Object.keys(PlayerSkillLevelDesc);
-    const playerSkillMap = new Map();
-    skillLevels.forEach((skillLevelDesc, i) => playerSkillMap.set(i, []));
+    const playerSkillMap: Map<number, Player[]> = new Map<number, Player[]>();
+    skillLevels.forEach((_, i) => playerSkillMap.set(i, []));
     waitingPlayers.forEach((player) => {
       // if player is linked, ignore
       const linkedPlayerIds =
@@ -97,14 +98,24 @@ export class MatchmakingService {
       // else, add player to playerSkillMap
       const { skillId } = player;
       const currentList = playerSkillMap.get(skillId);
+      if (!currentList) {
+        alert(`Error finding player skill level ${skillId}`);
+        return;
+      }
       playerSkillMap.set(skillId, [...currentList, player]);
     });
+
     // shuffle the order of players in each skill group
     const playerSkillMapLength = playerSkillMap.size;
     for (let i = 0; i < playerSkillMapLength; i++) {
-      const playerGroup = playerSkillMap.get(i);
-      this.shuffleArray(playerGroup);
+      const skillGroupPlayers = playerSkillMap.get(i);
+      if (!skillGroupPlayers) {
+        alert(`Error finding players with skill level ${i}`);
+        return;
+      }
+      this.shuffleArray(skillGroupPlayers);
     }
+
     // create linked player groups and remove those players from playerSkillMap
     let playerSkillMapArray: Player[][] = Array.from(playerSkillMap.values());
     const linkedPlayers = this.linkedPlayersService.linkedPlayers$.getValue();
@@ -137,19 +148,19 @@ export class MatchmakingService {
         }
         currentGroup.push(foundInfo.player);
         playerSkillMapArray = playerSkillMapArray.map((playerGroup) =>
-          playerGroup.filter(
-            (player: Player) => player.id !== foundInfo.player.id,
-          ),
+          playerGroup.filter((player) => player.id !== foundInfo.player.id),
         );
       }
       linkedPlayerGroups.push(currentGroup);
     }
+
     // remove people who have waited the least from the skill map array so that it is a multiple of 4 - this is to ensure people who have waited longer will always be put into a group
     let playerSkillMapArrayLength = 0;
     playerSkillMapArray.forEach(
       (playerGroup) => (playerSkillMapArrayLength += playerGroup.length),
     );
     const toRemove = playerSkillMapArrayLength % 4;
+    const removedPlayers: Player[] = [];
     for (let i = 0; i < toRemove; i++) {
       let shortestWaitIndex = -1;
       let shortestWaitInfo: {
@@ -172,46 +183,40 @@ export class MatchmakingService {
         return;
       }
       const { skillMapIndex, playerGroupIndex } = shortestWaitInfo;
+      removedPlayers.push(playerSkillMapArray[skillMapIndex][playerGroupIndex]);
       playerSkillMapArray[skillMapIndex].splice(playerGroupIndex, 1);
     }
+
     // group similar skill players together in groups of 4 by iterating through the map
     const sortedPlayerQueue: Player[] = [];
     playerSkillMapArray.forEach((playerGroup) =>
       playerGroup.forEach((player: Player) => sortedPlayerQueue.push(player)),
     );
-    const waitingGroups: Court[] = [];
-    let courtPlayers: Player[] = [];
+    const waitingGroups: Player[][] = [];
+    let currentGroup: Player[] = [];
     let count = 0;
-    const defaultCourtNumber = -1;
     sortedPlayerQueue.forEach((player) => {
-      courtPlayers.push(player);
+      currentGroup.push(player);
       count++;
-      // note any players that cannot form a group of 4 will not be added to waitingGroups
       if (count % 4 === 0) {
-        waitingGroups.push({
-          courtNumber: defaultCourtNumber,
-          players: courtPlayers,
-        });
-        courtPlayers = [];
+        waitingGroups.push(currentGroup);
+        currentGroup = [];
       }
     });
+
     // add linked player groups
-    linkedPlayerGroups.forEach((group) =>
-      waitingGroups.push({
-        courtNumber: defaultCourtNumber,
-        players: group,
-      }),
-    );
+    linkedPlayerGroups.forEach((group) => waitingGroups.push(group));
+
     // whoever is highest in the waiting list in each group will determine how early they are in the group queue
-    const sortedWaitingGroups: Court[] = [];
+    const sortedWaitingGroups: Player[][] = [];
     const visited = new Set();
     waitingPlayers.forEach((player) => {
       if (visited.has(player.id)) return;
       let foundIndex = -1;
       for (let i = 0; i < waitingGroups.length; i++) {
         const group = waitingGroups[i];
-        for (let j = 0; j < group.players.length; j++) {
-          const p = group.players[j];
+        for (let j = 0; j < group.length; j++) {
+          const p = group[j];
           if (player.id === p.id) {
             foundIndex = i;
           }
@@ -219,12 +224,20 @@ export class MatchmakingService {
       }
       if (foundIndex > -1) {
         const foundGroup = waitingGroups[foundIndex];
-        foundGroup.players.forEach((p) => visited.add(p.id));
+        foundGroup.forEach((p) => visited.add(p.id));
         sortedWaitingGroups.push(foundGroup);
         waitingGroups.splice(foundIndex, 1);
       }
     });
-    this.waitingGroups$.next(sortedWaitingGroups);
+
+    // add removed players (those who have waited the least) to the end of the queue
+    sortedWaitingGroups.push(removedPlayers);
+
+    // generate a final queue of players
+    const finalQueue: Player[] = [];
+    sortedWaitingGroups.forEach((group) => finalQueue.push(...group));
+
+    this.matchmakingQueuedPlayers$.next(finalQueue);
   }
   cycleCourt(court: Court) {
     // if there are players on the court, move them all to the bottom of the waiting players list and update the court list
@@ -237,18 +250,19 @@ export class MatchmakingService {
       return;
     }
 
-    // if waiting groups length is 0, run matchmaking algorithm to calculate waiting groups
+    // if length of matchmaking queue is less than 4, run matchmaking algorithm to calculate waiting groups
     let waitingPlayers = this.waitingPlayers$.getValue();
-    if (this.waitingGroups$.getValue().length === 0) {
+    if (this.matchmakingQueuedPlayers$.getValue().length < 4) {
       if (waitingPlayers.length < 4) {
         alert('Not enough players to matchmake');
         return;
       }
       this.matchmake(waitingPlayers);
     }
+
     // get first waiting group
-    const waitingGroups = this.waitingGroups$.getValue();
-    const nextGroup = waitingGroups.shift();
+    const matchmakingQueuedPlayers = this.matchmakingQueuedPlayers$.getValue();
+    const nextGroup = matchmakingQueuedPlayers.splice(0, 4);
     if (!nextGroup) {
       alert('Error getting next group: no group on waiting group list');
       return;
@@ -258,18 +272,18 @@ export class MatchmakingService {
     const updatedCourts = courts.map((c) => {
       if (c.courtNumber === court.courtNumber) {
         return {
-          ...nextGroup,
+          players: nextGroup,
           courtNumber: court.courtNumber,
         };
       }
       return c;
     });
     this.courtList$.next(updatedCourts);
-    this.waitingGroups$.next(waitingGroups);
+    this.matchmakingQueuedPlayers$.next(matchmakingQueuedPlayers);
 
     // remove the players from the waiting players list
     const newWaitingPlayers = waitingPlayers.filter((player) => {
-      return !nextGroup.players.find((p) => p.id === player.id);
+      return !nextGroup.find((p) => p.id === player.id);
     });
     this.waitingPlayers$.next(newWaitingPlayers);
 
@@ -290,18 +304,16 @@ export class MatchmakingService {
     this.waitingDuration$.next(waitingDuration);
   }
   undoCourt(court: Court) {
-    this.courtControllerService.updateCourt({ ...court, players: [] });
-
-    let waitingPlayers = this.waitingPlayers$.getValue();
-    court.players.forEach((player) => waitingPlayers.unshift(player));
-    this.waitingPlayers$.next(waitingPlayers);
-
-    const waitingGroups = this.waitingGroups$.getValue();
-    waitingGroups.unshift({
-      courtNumber: -1,
-      players: court.players,
-    });
-    this.waitingGroups$.next(waitingGroups);
+    // this.courtControllerService.updateCourt({ ...court, players: [] });
+    // let waitingPlayers = this.waitingPlayers$.getValue();
+    // court.players.forEach((player) => waitingPlayers.unshift(player));
+    // this.waitingPlayers$.next(waitingPlayers);
+    // const waitingGroups = this.waitingGroups$.getValue();
+    // waitingGroups.unshift({
+    //   courtNumber: -1,
+    //   players: court.players,
+    // });
+    // this.waitingGroups$.next(waitingGroups);
   }
 
   ngOnDestroy() {

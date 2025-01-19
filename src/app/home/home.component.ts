@@ -1,4 +1,6 @@
 import { Component, HostListener } from '@angular/core';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+
 import { Player } from '../player/services/player.service';
 import { Court } from '../court/court.component';
 import { BehaviorSubject } from 'rxjs';
@@ -16,8 +18,8 @@ export class HomeComponent {
   waitingPlayers$: BehaviorSubject<Player[]> =
     this.matchmakingService.getWaitingPlayers();
   courts$: BehaviorSubject<Court[]> = this.courtControllerService.getCourts();
-  waitingGroups$: BehaviorSubject<Court[]> =
-    this.matchmakingService.waitingGroups$;
+  matchmakingQueuedPlayers$: BehaviorSubject<Player[]> =
+    this.matchmakingService.matchmakingQueuedPlayers$;
   selectedPlayers: Player[] = [];
 
   constructor(
@@ -83,5 +85,14 @@ export class HomeComponent {
     this.matchmakingService.matchmake(waitingPlayers);
 
     this.clearSelectedPlayers();
+  }
+  reorderWaitingPlayers(event: CdkDragDrop<Player[]>) {
+    const matchmakingQueuedPlayers = this.matchmakingQueuedPlayers$.getValue();
+    moveItemInArray(
+      matchmakingQueuedPlayers,
+      event.previousIndex,
+      event.currentIndex,
+    );
+    this.matchmakingQueuedPlayers$.next(matchmakingQueuedPlayers);
   }
 }
