@@ -19,7 +19,7 @@ export class HomeComponent {
     this.matchmakingService.getWaitingPlayers();
   courts$: BehaviorSubject<Court[]> = this.courtControllerService.getCourts();
   matchmakingQueuedPlayers$: BehaviorSubject<Player[]> =
-    this.matchmakingService.matchmakingQueuedPlayers$;
+    this.matchmakingService.matchmakingQueuedPlayers$.getBehaviorSubject();
   selectedPlayers: Player[] = [];
 
   constructor(

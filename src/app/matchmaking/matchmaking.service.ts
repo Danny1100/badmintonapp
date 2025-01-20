@@ -8,6 +8,7 @@ import { PlayerListService } from '../player-list/player-list.service';
 import { CourtControllerService } from '../court-controller/court-controller.service';
 import { Court } from '../court/court.component';
 import { LinkedPlayersService } from '../linked-players/linked-players-service/linked-players.service';
+import { MatchmakingPlayerQueueSubject } from './matchmaking-player-queue-subject';
 
 @Injectable({
   providedIn: 'root',
@@ -23,9 +24,8 @@ export class MatchmakingService {
   courtList$: BehaviorSubject<Court[]> =
     this.courtControllerService.getCourts();
   courtList!: Court[];
-  matchmakingQueuedPlayers$: BehaviorSubject<Player[]> = new BehaviorSubject<
-    Player[]
-  >([]);
+  matchmakingQueuedPlayers$: MatchmakingPlayerQueueSubject =
+    new MatchmakingPlayerQueueSubject([], this.waitingPlayers$);
 
   waitingDuration$: BehaviorSubject<
     Map<number, { player: Player; waitPeriod: number }>
@@ -51,19 +51,6 @@ export class MatchmakingService {
     this.courtList$
       .pipe(takeUntil(this.ngUnsubscribe$))
       .subscribe((courts) => (this.courtList = courts));
-    // check there are no duplicate players in matchmaking queue
-    this.matchmakingQueuedPlayers$
-      .pipe(takeUntil(this.ngUnsubscribe$))
-      .subscribe((players) => {
-        const matchmakingQueuedPlayers = new Set<number>();
-        players.forEach((player) => {
-          if (matchmakingQueuedPlayers.has(player.id)) {
-            throw new Error('Player is in matchmaking queue more than once');
-          } else {
-            matchmakingQueuedPlayers.add(player.id);
-          }
-        });
-      });
   }
 
   getWaitingPlayers() {
@@ -250,15 +237,8 @@ export class MatchmakingService {
       return;
     }
 
-    // if length of matchmaking queue is less than 4, run matchmaking algorithm to calculate waiting groups
     let waitingPlayers = this.waitingPlayers$.getValue();
-    if (this.matchmakingQueuedPlayers$.getValue().length < 4) {
-      if (waitingPlayers.length < 4) {
-        alert('Not enough players to matchmake');
-        return;
-      }
-      this.matchmake(waitingPlayers);
-    }
+    this.matchmake(waitingPlayers);
 
     // get first waiting group
     const matchmakingQueuedPlayers = this.matchmakingQueuedPlayers$.getValue();
@@ -279,13 +259,14 @@ export class MatchmakingService {
       return c;
     });
     this.courtList$.next(updatedCourts);
-    this.matchmakingQueuedPlayers$.next(matchmakingQueuedPlayers);
 
     // remove the players from the waiting players list
     const newWaitingPlayers = waitingPlayers.filter((player) => {
       return !nextGroup.find((p) => p.id === player.id);
     });
     this.waitingPlayers$.next(newWaitingPlayers);
+
+    this.matchmakingQueuedPlayers$.next(matchmakingQueuedPlayers);
 
     // update waiting duration for each player
     const updatedWaitingPlayers = this.waitingPlayers$.getValue();
