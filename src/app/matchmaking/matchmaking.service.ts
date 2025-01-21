@@ -45,6 +45,32 @@ export class MatchmakingService {
         waitingPlayers.push(player);
         this.waitingPlayers$.next(waitingPlayers);
       });
+    // whenever waiting players list is updated, update matchmaking queue to have the same players and then matchmake
+    this.waitingPlayers$
+      .pipe(takeUntil(this.ngUnsubscribe$))
+      .subscribe((waitingPlayers) => {
+        const matchmakingQueuedPlayers =
+          this.matchmakingQueuedPlayers$.getValue();
+        if (waitingPlayers.length > matchmakingQueuedPlayers.length) {
+          const playersToAdd = waitingPlayers.filter(
+            (player) =>
+              !matchmakingQueuedPlayers.find((p) => p.id === player.id),
+          );
+          this.matchmakingQueuedPlayers$.next([
+            ...matchmakingQueuedPlayers,
+            ...playersToAdd,
+          ]);
+        } else if (waitingPlayers.length < matchmakingQueuedPlayers.length) {
+          const playersToRemove = matchmakingQueuedPlayers.filter(
+            (player) => !waitingPlayers.find((p) => p.id === player.id),
+          );
+          const newMatchmakingQueuedPlayers = matchmakingQueuedPlayers.filter(
+            (player) => !playersToRemove.find((p) => p.id === player.id),
+          );
+          this.matchmakingQueuedPlayers$.next(newMatchmakingQueuedPlayers);
+        }
+        this.matchmake(waitingPlayers);
+      });
     this.playerList$
       .pipe(takeUntil(this.ngUnsubscribe$))
       .subscribe((players) => (this.playerList = players));
@@ -73,11 +99,21 @@ export class MatchmakingService {
     }
   }
   matchmake(waitingPlayers: Player[]) {
+    const matchmakingQueuedPlayers = this.matchmakingQueuedPlayers$.getValue();
+    let playersToMatchmake = waitingPlayers;
+
+    // calculate matchmaking queue on rolling basis
+    if (matchmakingQueuedPlayers.length > 0) {
+      const PROPORTION = 0.3;
+      const n = Math.floor(matchmakingQueuedPlayers.length * PROPORTION);
+      playersToMatchmake = matchmakingQueuedPlayers.slice(-n);
+    }
+
     // use a dictionary to store the number of players in each level
     const skillLevels = Object.keys(PlayerSkillLevelDesc);
     const playerSkillMap: Map<number, Player[]> = new Map<number, Player[]>();
     skillLevels.forEach((_, i) => playerSkillMap.set(i, []));
-    waitingPlayers.forEach((player) => {
+    playersToMatchmake.forEach((player) => {
       // if player is linked, ignore
       const linkedPlayerIds =
         this.linkedPlayersService.linkedPlayerIds$.getValue();
@@ -221,10 +257,14 @@ export class MatchmakingService {
     sortedWaitingGroups.push(removedPlayers);
 
     // generate a final queue of players
-    const finalQueue: Player[] = [];
-    sortedWaitingGroups.forEach((group) => finalQueue.push(...group));
+    const matchmadeQueue: Player[] = [];
+    sortedWaitingGroups.forEach((group) => matchmadeQueue.push(...group));
 
-    this.matchmakingQueuedPlayers$.next(finalQueue);
+    // append matchmadeQueue to existing matchmakingQueuedPlayers
+    const n = matchmadeQueue.length;
+    matchmakingQueuedPlayers.splice(-n, n, ...matchmadeQueue);
+
+    this.matchmakingQueuedPlayers$.next(matchmakingQueuedPlayers);
   }
   cycleCourt(court: Court) {
     // if there are players on the court, move them all to the bottom of the waiting players list and update the court list
@@ -237,12 +277,9 @@ export class MatchmakingService {
       return;
     }
 
-    let waitingPlayers = this.waitingPlayers$.getValue();
-    this.matchmake(waitingPlayers);
-
     // get first waiting group
     const matchmakingQueuedPlayers = this.matchmakingQueuedPlayers$.getValue();
-    const nextGroup = matchmakingQueuedPlayers.splice(0, 4);
+    const nextGroup = matchmakingQueuedPlayers.slice(0, 4);
     if (!nextGroup) {
       alert('Error getting next group: no group on waiting group list');
       return;
@@ -261,12 +298,11 @@ export class MatchmakingService {
     this.courtList$.next(updatedCourts);
 
     // remove the players from the waiting players list
+    let waitingPlayers = this.waitingPlayers$.getValue();
     const newWaitingPlayers = waitingPlayers.filter((player) => {
       return !nextGroup.find((p) => p.id === player.id);
     });
     this.waitingPlayers$.next(newWaitingPlayers);
-
-    this.matchmakingQueuedPlayers$.next(matchmakingQueuedPlayers);
 
     // update waiting duration for each player
     const updatedWaitingPlayers = this.waitingPlayers$.getValue();
