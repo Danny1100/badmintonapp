@@ -14,6 +14,7 @@ import { AddPlayerComponent } from './add-player/add-player.component';
 import { AddCourtComponent } from './add-court/add-court.component';
 import { LinkedPlayersComponent } from './linked-players/linked-players.component';
 import { WaitDurationComponent } from './wait-duration/wait-duration.component';
+import { RunMatchmakingComponent } from './run-matchmaking/run-matchmaking.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { WaitDurationComponent } from './wait-duration/wait-duration.component';
     BrowserAnimationsModule,
     FormsModule,
     DragDropModule,
+    RunMatchmakingComponent,
   ],
   providers: [],
   bootstrap: [AppComponent],

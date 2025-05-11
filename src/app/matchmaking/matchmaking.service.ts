@@ -69,7 +69,6 @@ export class MatchmakingService {
           );
           this.matchmakingQueuedPlayers$.next(newMatchmakingQueuedPlayers);
         }
-        this.matchmake(waitingPlayers);
       });
     this.playerList$
       .pipe(takeUntil(this.ngUnsubscribe$))
@@ -98,15 +97,15 @@ export class MatchmakingService {
       [array[i], array[j]] = [array[j], array[i]];
     }
   }
-  matchmake(waitingPlayers: Player[]) {
+  matchmake(waitingPlayers: Player[], numberOfPlayersToMatchmake: number) {
     const matchmakingQueuedPlayers = this.matchmakingQueuedPlayers$.getValue();
     let playersToMatchmake = waitingPlayers;
 
     // calculate matchmaking queue on rolling basis
     if (matchmakingQueuedPlayers.length > 0) {
-      const PROPORTION = 0.3;
-      const n = Math.floor(matchmakingQueuedPlayers.length * PROPORTION);
-      playersToMatchmake = matchmakingQueuedPlayers.slice(-n);
+      playersToMatchmake = matchmakingQueuedPlayers.slice(
+        -numberOfPlayersToMatchmake,
+      );
     }
 
     // use a dictionary to store the number of players in each level

@@ -1,0 +1,25 @@
+<div class="form-container m-3">
+  <form>
+    <div>
+      <label for="numberOfPlayersToMatchmake" class="form-label"
+        >Number of Players to Matchmake</label
+      >
+      <div class="matchmake-number-input-container">
+        <input
+          type="number"
+          class="form-control"
+          id="numberOfPlayersToMatchmake"
+          name="numberOfPlayersToMatchmake"
+          [(ngModel)]="numberOfPlayersToMatchmake"
+        />
+        <button
+          type="submit"
+          class="btn btn-primary btn-submit"
+          (click)="matchmake()"
+        >
+          Matchmake
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

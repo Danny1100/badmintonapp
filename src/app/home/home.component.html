@@ -22,10 +22,17 @@
       <div class="add-court-container mb-3">
         <app-add-court></app-add-court>
       </div>
+      <div class="run-matchmaking-container mb-3">
+        <app-run-matchmaking></app-run-matchmaking>
+      </div>
       <div class="main-container">
         <div class="player-list-container my-3 mx-3">
           <div class="button-toolbar">
-            <button class="btn btn-primary mb-3 mr-3" (click)="linkPlayers()">
+            <button
+              class="btn btn-primary mb-3 mr-3"
+              (click)="linkPlayers()"
+              disabled
+            >
               Link Players
             </button>
             <button

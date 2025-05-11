@@ -82,7 +82,7 @@ export class HomeComponent {
     this.linkedPlayersService.linkedPlayers$.next(linkedPlayers);
     // run matchmaking algorithm to update court queue
     const waitingPlayers = this.matchmakingService.waitingPlayers$.getValue();
-    this.matchmakingService.matchmake(waitingPlayers);
+    this.matchmakingService.matchmake(waitingPlayers, waitingPlayers.length);
 
     this.clearSelectedPlayers();
   }
