@@ -18,8 +18,9 @@ export class HomeComponent {
   waitingPlayers$: BehaviorSubject<Player[]> =
     this.matchmakingService.getWaitingPlayers();
   courts$: BehaviorSubject<Court[]> = this.courtControllerService.getCourts();
-  matchmakingQueuedPlayers$: BehaviorSubject<Player[]> =
-    this.matchmakingService.matchmakingQueuedPlayers$.getBehaviorSubject();
+  // TODO: rename this to matchmakingQueuedGroups
+  matchmakingQueuedPlayers$: BehaviorSubject<Player[][]> =
+    this.matchmakingService.matchmakingQueuedPlayers$;
   selectedPlayers: Player[] = [];
 
   constructor(
@@ -56,35 +57,35 @@ export class HomeComponent {
     this.selectedPlayers = [];
   }
   linkPlayers() {
-    const length = this.selectedPlayers.length;
-    if (length < 2 || length > 4) {
-      alert(
-        `Invalid number of selected players. Currently selected ${length} players.`,
-      );
-      return;
-    }
-    // check players are not already linked.
-    const linkedPlayerIds =
-      this.linkedPlayersService.linkedPlayerIds$.getValue();
-    for (let i = 0; i < this.selectedPlayers.length; i++) {
-      const playerId = this.selectedPlayers[i].id;
-      if (linkedPlayerIds.has(playerId)) {
-        alert(`Invalid group: player with id ${playerId} is already linked.`);
-        return;
-      }
-    }
-    // add them to set of linked players so they cannot be added again later
-    this.selectedPlayers.forEach((player) => linkedPlayerIds.add(player.id));
-    this.linkedPlayersService.linkedPlayerIds$.next(linkedPlayerIds);
-    // add them to link group
-    const linkedPlayers = this.linkedPlayersService.linkedPlayers$.getValue();
-    linkedPlayers.push(this.selectedPlayers);
-    this.linkedPlayersService.linkedPlayers$.next(linkedPlayers);
-    // run matchmaking algorithm to update court queue
-    const waitingPlayers = this.matchmakingService.waitingPlayers$.getValue();
-    this.matchmakingService.matchmake(waitingPlayers, waitingPlayers.length);
-
-    this.clearSelectedPlayers();
+    // TODO: implement linking players and move this to matchmaking service
+    // const length = this.selectedPlayers.length;
+    // if (length < 2 || length > 4) {
+    //   alert(
+    //     `Invalid number of selected players. Currently selected ${length} players.`,
+    //   );
+    //   return;
+    // }
+    // // check players are not already linked.
+    // const linkedPlayerIds =
+    //   this.linkedPlayersService.linkedPlayerIds$.getValue();
+    // for (let i = 0; i < this.selectedPlayers.length; i++) {
+    //   const playerId = this.selectedPlayers[i].id;
+    //   if (linkedPlayerIds.has(playerId)) {
+    //     alert(`Invalid group: player with id ${playerId} is already linked.`);
+    //     return;
+    //   }
+    // }
+    // // add them to set of linked players so they cannot be added again later
+    // this.selectedPlayers.forEach((player) => linkedPlayerIds.add(player.id));
+    // this.linkedPlayersService.linkedPlayerIds$.next(linkedPlayerIds);
+    // // add them to link group
+    // const linkedPlayers = this.linkedPlayersService.linkedPlayers$.getValue();
+    // linkedPlayers.push(this.selectedPlayers);
+    // this.linkedPlayersService.linkedPlayers$.next(linkedPlayers);
+    // // run matchmaking algorithm to update court queue
+    // const waitingPlayers = this.matchmakingService.waitingPlayers$.getValue();
+    // this.matchmakingService.matchmake(waitingPlayers, waitingPlayers.length);
+    // this.clearSelectedPlayers();
   }
   reorderWaitingPlayers(event: CdkDragDrop<Player[]>) {
     const matchmakingQueuedPlayers = this.matchmakingQueuedPlayers$.getValue();

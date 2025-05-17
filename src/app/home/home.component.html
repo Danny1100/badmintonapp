@@ -22,19 +22,21 @@
       <div class="add-court-container mb-3">
         <app-add-court></app-add-court>
       </div>
+      <!-- TODO: add run matchmaking component
       <div class="run-matchmaking-container mb-3">
         <app-run-matchmaking></app-run-matchmaking>
-      </div>
+      </div> -->
       <div class="main-container">
         <div class="player-list-container my-3 mx-3">
           <div class="button-toolbar">
-            <button
+            <!-- TODO: Add link players button -->
+            <!-- <button
               class="btn btn-primary mb-3 mr-3"
               (click)="linkPlayers()"
               disabled
             >
               Link Players
-            </button>
+            </button> -->
             <button
               class="btn btn-danger mb-3"
               (click)="clearSelectedPlayers()"
@@ -91,7 +93,8 @@
             </div>
           }
         </div>
-        <div class="waiting-groups-container my-5 mx-3">
+        <!-- TODO: add this back -->
+        <!-- <div class="waiting-groups-container my-5 mx-3">
           @if ((matchmakingQueuedPlayers$ | async)?.length) {
             <h2 class="mb-3">Queued Groups</h2>
           }
@@ -117,7 +120,7 @@
               </div>
             }
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </body>
