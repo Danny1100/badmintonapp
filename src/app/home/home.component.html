@@ -93,34 +93,29 @@
             </div>
           }
         </div>
-        <!-- TODO: add this back -->
-        <!-- <div class="waiting-groups-container my-5 mx-3">
+        <div class="waiting-groups-container my-5 mx-3">
           @if ((matchmakingQueuedPlayers$ | async)?.length) {
             <h2 class="mb-3">Queued Groups</h2>
           }
-          <div
-            cdkDropList
-            class="waiting-groups-player-list"
-            (cdkDropListDropped)="reorderWaitingPlayers($event)"
-          >
+          <div class="waiting-groups-player-list">
             @for (
-              player of matchmakingQueuedPlayers$ | async;
-              track player;
-              let i = $index
+              group of matchmakingQueuedPlayers$ | async;
+              track group;
+              let groupIndex = $index
             ) {
-              @if (i !== 0 && i % 4 === 0) {
-                <hr />
+              @for (player of group; track player; let playerIndex = $index) {
+                <div class="waiting-group-list-item mb-3">
+                  <app-player
+                    [id]="player.id"
+                    [name]="player.name"
+                    [skillId]="player.skillId"
+                  ></app-player>
+                </div>
               }
-              <div class="waiting-group-list-item mb-3" cdkDrag>
-                <app-player
-                  [id]="player.id"
-                  [name]="player.name"
-                  [skillId]="player.skillId"
-                ></app-player>
-              </div>
+              <hr />
             }
           </div>
-        </div> -->
+        </div>
       </div>
     </div>
   </body>
