@@ -18,9 +18,8 @@ export class HomeComponent {
   waitingPlayers$: BehaviorSubject<Player[]> =
     this.matchmakingService.getWaitingPlayers();
   courts$: BehaviorSubject<Court[]> = this.courtControllerService.getCourts();
-  // TODO: rename this to matchmakingQueuedGroups
-  matchmakingQueuedPlayers$: BehaviorSubject<Player[][]> =
-    this.matchmakingService.matchmakingQueuedPlayers$;
+  matchmakingQueuedGroups$: BehaviorSubject<Player[][]> =
+    this.matchmakingService.matchmakingQueuedGroups$;
   selectedPlayers: Player[] = [];
 
   constructor(
@@ -86,14 +85,5 @@ export class HomeComponent {
     // const waitingPlayers = this.matchmakingService.waitingPlayers$.getValue();
     // this.matchmakingService.matchmake(waitingPlayers, waitingPlayers.length);
     // this.clearSelectedPlayers();
-  }
-  reorderWaitingPlayers(event: CdkDragDrop<Player[]>) {
-    const matchmakingQueuedPlayers = this.matchmakingQueuedPlayers$.getValue();
-    moveItemInArray(
-      matchmakingQueuedPlayers,
-      event.previousIndex,
-      event.currentIndex,
-    );
-    this.matchmakingQueuedPlayers$.next(matchmakingQueuedPlayers);
   }
 }

@@ -94,12 +94,12 @@
           }
         </div>
         <div class="waiting-groups-container my-5 mx-3">
-          @if ((matchmakingQueuedPlayers$ | async)?.length) {
+          @if ((matchmakingQueuedGroups$ | async)?.length) {
             <h2 class="mb-3">Queued Groups</h2>
           }
           <div class="waiting-groups-player-list">
             @for (
-              group of matchmakingQueuedPlayers$ | async;
+              group of matchmakingQueuedGroups$ | async;
               track group;
               let groupIndex = $index
             ) {

@@ -22,7 +22,7 @@ export class MatchmakingService {
     this.courtControllerService.getCourts();
   courtList!: Court[];
   // TODO: rename this to matchmakingQueuedGroups
-  matchmakingQueuedPlayers$: BehaviorSubject<Player[][]> = new BehaviorSubject<
+  matchmakingQueuedGroups$: BehaviorSubject<Player[][]> = new BehaviorSubject<
     Player[][]
   >([]);
 
@@ -48,7 +48,7 @@ export class MatchmakingService {
     this.waitingPlayers$
       .pipe(takeUntil(this.ngUnsubscribe$))
       .subscribe((waitingPlayers) => {
-        this.matchmakingQueuedPlayers$.next(chunkArray(waitingPlayers, 4));
+        this.matchmakingQueuedGroups$.next(chunkArray(waitingPlayers, 4));
       });
     this.playerList$
       .pipe(takeUntil(this.ngUnsubscribe$))
@@ -245,8 +245,8 @@ export class MatchmakingService {
     }
 
     // get first waiting group
-    const matchmakingQueuedPlayers = this.matchmakingQueuedPlayers$.getValue();
-    const nextGroup = matchmakingQueuedPlayers[0];
+    const matchmakingQueuedGroups = this.matchmakingQueuedGroups$.getValue();
+    const nextGroup = matchmakingQueuedGroups[0];
     if (!nextGroup) {
       alert('Error getting next group: no group on waiting group list');
       return;
