@@ -5,10 +5,18 @@
   display: flex;
   gap: 20px;
 }
+.player-list {
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: flex-start;
+}
 .player-list-item {
   display: flex;
   align-items: center;
   gap: 20px;
+  margin-right: 50px;
 }
 .li-number {
   width: 20px;
