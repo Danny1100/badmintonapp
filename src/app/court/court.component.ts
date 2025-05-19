@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Player } from '../player/services/player.service';
 import { CourtControllerService } from '../court-controller/court-controller.service';
 import { MatchmakingService } from '../matchmaking/matchmaking.service';
+import { PlayerComponent } from '../player/player.component';
 
 export interface Court {
   courtNumber: number;
@@ -9,9 +10,11 @@ export interface Court {
 }
 
 @Component({
-  selector: 'app-court',
-  templateUrl: './court.component.html',
-  styleUrls: ['./court.component.css'],
+    selector: 'app-court',
+    templateUrl: './court.component.html',
+    styleUrls: ['./court.component.css'],
+    standalone: true,
+    imports: [PlayerComponent],
 })
 export class CourtComponent {
   @Input({ required: true }) courtNumber!: number;

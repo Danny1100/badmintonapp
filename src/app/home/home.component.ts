@@ -2,17 +2,27 @@ import { Component, HostListener } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 import { Player } from '../player/services/player.service';
-import { Court } from '../court/court.component';
+import { Court, CourtComponent } from '../court/court.component';
 import { BehaviorSubject } from 'rxjs';
 import { CourtControllerService } from '../court-controller/court-controller.service';
 import { MatchmakingService } from '../matchmaking/matchmaking.service';
 import { PlayerListService } from '../player-list/player-list.service';
 import { LinkedPlayersService } from '../linked-players/linked-players-service/linked-players.service';
+import { AddCourtComponent } from '../add-court/add-court.component';
+import { PlayerComponent } from '../player/player.component';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css'],
+    selector: 'app-home',
+    templateUrl: './home.component.html',
+    styleUrls: ['./home.component.css'],
+    standalone: true,
+    imports: [
+        CourtComponent,
+        AddCourtComponent,
+        PlayerComponent,
+        AsyncPipe,
+    ],
 })
 export class HomeComponent {
   waitingPlayers$: BehaviorSubject<Player[]> =

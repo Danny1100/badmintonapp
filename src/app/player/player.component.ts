@@ -1,10 +1,13 @@
 import { Component, Input } from '@angular/core';
 import { PlayerService } from './services/player.service';
+import { NgStyle } from '@angular/common';
 
 @Component({
-  selector: 'app-player',
-  templateUrl: './player.component.html',
-  styleUrls: ['./player.component.css'],
+    selector: 'app-player',
+    templateUrl: './player.component.html',
+    styleUrls: ['./player.component.css'],
+    standalone: true,
+    imports: [NgStyle],
 })
 export class PlayerComponent {
   @Input({ required: true }) id!: number;

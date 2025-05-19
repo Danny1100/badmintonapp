@@ -8,8 +8,8 @@ describe('WaitDurationComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [WaitDurationComponent]
-    });
+    imports: [WaitDurationComponent]
+});
     fixture = TestBed.createComponent(WaitDurationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
