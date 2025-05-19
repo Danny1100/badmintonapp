@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, ReplaySubject, Subject, takeUntil } from 'rxjs';
 import { Player } from '../player/services/player.service';
-import { PlayerListService } from '../player-list/player-list.service';
+import { PlayerListService } from '../player-list/player-list-service/player-list.service';
 import { CourtControllerService } from '../court-controller/court-controller.service';
 import { Court } from '../court/court.component';
 import { LinkedPlayersService } from '../linked-players/linked-players-service/linked-players.service';

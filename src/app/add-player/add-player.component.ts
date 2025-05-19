@@ -7,23 +7,18 @@ import {
   PlayerSkillLevelDesc,
 } from '../player/services/player.service';
 import { BehaviorSubject } from 'rxjs';
-import { PlayerListService } from '../player-list/player-list.service';
+import { PlayerListService } from '../player-list/player-list-service/player-list.service';
 import { parse } from 'papaparse';
 import { FormsModule } from '@angular/forms';
 import { NgStyle, AsyncPipe } from '@angular/common';
 import { PlayerComponent } from '../player/player.component';
 
 @Component({
-    selector: 'app-add-player',
-    templateUrl: './add-player.component.html',
-    styleUrls: ['./add-player.component.css'],
-    standalone: true,
-    imports: [
-        FormsModule,
-        NgStyle,
-        PlayerComponent,
-        AsyncPipe,
-    ],
+  selector: 'app-add-player',
+  templateUrl: './add-player.component.html',
+  styleUrls: ['./add-player.component.css'],
+  standalone: true,
+  imports: [FormsModule, NgStyle, PlayerComponent, AsyncPipe],
 })
 export class AddPlayerComponent {
   currentId$: BehaviorSubject<number> =
