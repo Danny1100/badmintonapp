@@ -5,10 +5,18 @@
 .player-list-container {
   flex: 1;
 }
+.player-list {
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: flex-start;
+}
 .player-list-item {
   display: flex;
   align-items: center;
   gap: 20px;
+  margin-right: 50px;
 }
 .btn-remove-player {
   display: flex;
