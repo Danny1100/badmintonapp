@@ -21,7 +21,6 @@ export class MatchmakingService {
   courtList$: BehaviorSubject<Court[]> =
     this.courtControllerService.getCourts();
   courtList!: Court[];
-  // TODO: rename this to matchmakingQueuedGroups
   matchmakingQueuedGroups$: BehaviorSubject<Player[][]> = new BehaviorSubject<
     Player[][]
   >([]);
