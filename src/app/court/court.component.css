@@ -1,5 +1,6 @@
 .court-container {
-  width: 320px;
+  --court-width: 240px;
+  width: var(--court-width);
   height: 300px;
   display: flex;
   flex-direction: column;
@@ -35,6 +36,6 @@
 }
 
 hr {
-  width: 320px;
+  width: var(--court-width);
   margin: 0;
 }
