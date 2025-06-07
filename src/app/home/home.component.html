@@ -25,29 +25,32 @@
       <div class="run-matchmaking-container mb-3">
         <app-run-matchmaking></app-run-matchmaking>
       </div> -->
-      <div class="main-container">
+      <div class="queued-groups-container">
+        @if ((matchmakingQueuedGroups$ | async)?.length) {
+          <h2 class="mb-3">Queued Groups</h2>
+        }
         <div class="waiting-groups-container my-3 mx-3">
-          @if ((matchmakingQueuedGroups$ | async)?.length) {
-            <h2 class="mb-3">Queued Groups</h2>
+          @for (
+            group of matchmakingQueuedGroups$ | async;
+            track group;
+            let groupIndex = $index
+          ) {
+            <div class="waiting-group mx-3 mb-3">
+              <p class="waiting-group-number">{{ groupIndex + 1 }}.</p>
+              <div>
+                @for (player of group; track player; let playerIndex = $index) {
+                  <div class="waiting-group-list-item mb-3">
+                    <app-player
+                      [id]="player.id"
+                      [name]="player.name"
+                      [skillId]="player.skillId"
+                    ></app-player>
+                  </div>
+                }
+              </div>
+            </div>
+            <hr />
           }
-          <div class="waiting-groups-player-list">
-            @for (
-              group of matchmakingQueuedGroups$ | async;
-              track group;
-              let groupIndex = $index
-            ) {
-              @for (player of group; track player; let playerIndex = $index) {
-                <div class="waiting-group-list-item mb-3">
-                  <app-player
-                    [id]="player.id"
-                    [name]="player.name"
-                    [skillId]="player.skillId"
-                  ></app-player>
-                </div>
-              }
-              <hr />
-            }
-          </div>
         </div>
       </div>
     </div>
