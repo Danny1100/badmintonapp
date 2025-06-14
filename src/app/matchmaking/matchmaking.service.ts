@@ -11,21 +11,20 @@ import { chunkArray } from './matchmaking.util';
   providedIn: 'root',
 })
 export class MatchmakingService {
-  addedPlayer$: ReplaySubject<Player> =
+  private addedPlayer$: ReplaySubject<Player> =
     this.playerListService.getAddedPlayerStream();
-  waitingPlayers$: BehaviorSubject<Player[]> = new BehaviorSubject<Player[]>(
-    [],
-  );
-  courtList$: BehaviorSubject<Court[]> =
-    this.courtControllerService.getCourts();
-  matchmakingQueuedGroups$: BehaviorSubject<Player[][]> = new BehaviorSubject<
-    Player[][]
+  private waitingPlayers$: BehaviorSubject<Player[]> = new BehaviorSubject<
+    Player[]
   >([]);
+  private courtList$: BehaviorSubject<Court[]> =
+    this.courtControllerService.getCourts();
+  private matchmakingQueuedGroups$: BehaviorSubject<Player[][]> =
+    new BehaviorSubject<Player[][]>([]);
 
-  waitingDuration$: BehaviorSubject<
+  private waitingDuration$: BehaviorSubject<
     Map<number, { player: Player; waitPeriod: number }>
   > = new BehaviorSubject(new Map());
-  ngUnsubscribe$: Subject<boolean> = new Subject();
+  private ngUnsubscribe$: Subject<boolean> = new Subject();
 
   constructor(
     private playerListService: PlayerListService,
@@ -51,12 +50,19 @@ export class MatchmakingService {
   getWaitingPlayers() {
     return this.waitingPlayers$;
   }
+  getMatchmakingQueuedGroups() {
+    return this.matchmakingQueuedGroups$;
+  }
+  getWaitingDuration() {
+    return this.waitingDuration$;
+  }
   removeWaitingPlayer(playerId: number) {
     let waitingPlayers = this.waitingPlayers$.getValue();
     waitingPlayers = waitingPlayers.filter((player) => player.id !== playerId);
     this.waitingPlayers$.next(waitingPlayers);
-    const linkedPlayerIds =
-      this.linkedPlayersService.linkedPlayerIds$.getValue();
+    const linkedPlayerIds = this.linkedPlayersService
+      .getLinkedPlayerIds()
+      .getValue();
     if (linkedPlayerIds.has(playerId)) {
       this.linkedPlayersService.removeLinkedPlayerById(playerId);
     }

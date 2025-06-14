@@ -5,14 +5,14 @@ import { CourtComponent } from '../court/court.component';
 import { AsyncPipe } from '@angular/common';
 
 @Component({
-    selector: 'app-linked-players',
-    templateUrl: './linked-players.component.html',
-    styleUrls: ['./linked-players.component.css'],
-    standalone: true,
-    imports: [CourtComponent, AsyncPipe],
+  selector: 'app-linked-players',
+  templateUrl: './linked-players.component.html',
+  styleUrls: ['./linked-players.component.css'],
+  standalone: true,
+  imports: [CourtComponent, AsyncPipe],
 })
 export class LinkedPlayersComponent {
-  linkedPlayers$ = this.linkedPlayersService.linkedPlayers$;
+  linkedPlayers$ = this.linkedPlayersService.getLinkedPlayers();
 
   constructor(private linkedPlayersService: LinkedPlayersService) {}
 

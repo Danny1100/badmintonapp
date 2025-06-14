@@ -6,15 +6,21 @@ import { Player } from 'src/app/player/services/player.service';
   providedIn: 'root',
 })
 export class LinkedPlayersService {
-  linkedPlayers$: BehaviorSubject<Player[][]> = new BehaviorSubject<Player[][]>(
-    [],
-  );
-  linkedPlayerIds$: BehaviorSubject<Set<number>> = new BehaviorSubject<
+  private linkedPlayers$: BehaviorSubject<Player[][]> = new BehaviorSubject<
+    Player[][]
+  >([]);
+  private linkedPlayerIds$: BehaviorSubject<Set<number>> = new BehaviorSubject<
     Set<number>
   >(new Set([]));
 
   constructor() {}
 
+  getLinkedPlayers() {
+    return this.linkedPlayers$;
+  }
+  getLinkedPlayerIds() {
+    return this.linkedPlayerIds$;
+  }
   removeLinkedPlayers(group: Player[]) {
     const linkedPlayerIds = this.linkedPlayerIds$.getValue();
     group.forEach((player) => linkedPlayerIds.delete(player.id));

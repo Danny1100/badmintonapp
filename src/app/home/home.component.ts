@@ -4,8 +4,6 @@ import { Court, CourtComponent } from '../court/court.component';
 import { BehaviorSubject } from 'rxjs';
 import { CourtControllerService } from '../court-controller/court-controller.service';
 import { MatchmakingService } from '../matchmaking/matchmaking.service';
-import { PlayerListService } from '../player-list/player-list-service/player-list.service';
-import { LinkedPlayersService } from '../linked-players/linked-players-service/linked-players.service';
 import { AddCourtComponent } from '../add-court/add-court.component';
 import { PlayerComponent } from '../player/player.component';
 import { AsyncPipe } from '@angular/common';
@@ -20,9 +18,9 @@ import { AsyncPipe } from '@angular/common';
 export class HomeComponent {
   courts$: BehaviorSubject<Court[]> = this.courtControllerService.getCourts();
   matchmakingQueuedGroups$: BehaviorSubject<Player[][]> =
-    this.matchmakingService.matchmakingQueuedGroups$;
+    this.matchmakingService.getMatchmakingQueuedGroups();
   waitingPlayers$: BehaviorSubject<Player[]> =
-    this.matchmakingService.waitingPlayers$;
+    this.matchmakingService.getWaitingPlayers();
 
   constructor(
     private courtControllerService: CourtControllerService,

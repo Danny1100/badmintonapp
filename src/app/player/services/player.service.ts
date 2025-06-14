@@ -31,7 +31,7 @@ export interface PlayerSkillData {
 })
 export class PlayerService {
   // player skill level - lower number/index is higher skill
-  skillMap = [
+  private skillMap = [
     {
       skillLevel: PlayerSkillLevelDesc.Cracked,
       colour: PlayerSkillLevelColour.Cracked,

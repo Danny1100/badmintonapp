@@ -6,9 +6,12 @@ import { Player } from '../../player/services/player.service';
   providedIn: 'root',
 })
 export class PlayerListService {
-  currentPlayerId$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
-  playerList$: BehaviorSubject<Player[]> = new BehaviorSubject<Player[]>([]);
-  addedPlayer$: ReplaySubject<Player> = new ReplaySubject<Player>();
+  private currentPlayerId$: BehaviorSubject<number> =
+    new BehaviorSubject<number>(0);
+  private playerList$: BehaviorSubject<Player[]> = new BehaviorSubject<
+    Player[]
+  >([]);
+  private addedPlayer$: ReplaySubject<Player> = new ReplaySubject<Player>();
 
   constructor() {}
 
