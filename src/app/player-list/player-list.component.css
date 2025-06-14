@@ -2,11 +2,8 @@
   display: flex;
   gap: 20px;
 }
-.player-list-container {
-  flex: 1;
-}
 .player-list {
-  max-height: 80vh;
+  max-height: 100vh;
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;

@@ -16,12 +16,25 @@ import { AsyncPipe } from '@angular/common';
 export class PlayerListComponent {
   waitingPlayers$: BehaviorSubject<Player[]> =
     this.matchmakingService.getWaitingPlayers();
+  currentlyPlayingPlayers: Player[] = [];
   selectedPlayers: Player[] = [];
 
   constructor(
     private playerListService: PlayerListService,
     private matchmakingService: MatchmakingService,
-  ) {}
+  ) {
+    this.waitingPlayers$.subscribe((waitingPlayers) => {
+      this.currentlyPlayingPlayers = this.playerListService
+        .getPlayers()
+        .getValue()
+        .filter(
+          (player) =>
+            !waitingPlayers.find(
+              (waitingPlayer) => waitingPlayer.id === player.id,
+            ),
+        );
+    });
+  }
 
   @HostListener('window:beforeunload', ['$event']) onRefresh(event: Event) {
     event.preventDefault();
