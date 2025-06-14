@@ -1,3 +1,6 @@
+.add-player-container {
+  margin-top: 4.5rem;
+}
 .player-skill-level-label {
   text-transform: capitalize;
 }
