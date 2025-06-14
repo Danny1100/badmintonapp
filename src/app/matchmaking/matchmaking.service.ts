@@ -13,14 +13,11 @@ import { chunkArray } from './matchmaking.util';
 export class MatchmakingService {
   addedPlayer$: ReplaySubject<Player> =
     this.playerListService.getAddedPlayerStream();
-  playerList$: BehaviorSubject<Player[]> = this.playerListService.getPlayers();
-  playerList!: Player[];
   waitingPlayers$: BehaviorSubject<Player[]> = new BehaviorSubject<Player[]>(
     [],
   );
   courtList$: BehaviorSubject<Court[]> =
     this.courtControllerService.getCourts();
-  courtList!: Court[];
   matchmakingQueuedGroups$: BehaviorSubject<Player[][]> = new BehaviorSubject<
     Player[][]
   >([]);
@@ -49,12 +46,6 @@ export class MatchmakingService {
       .subscribe((waitingPlayers) => {
         this.matchmakingQueuedGroups$.next(chunkArray(waitingPlayers, 4));
       });
-    this.playerList$
-      .pipe(takeUntil(this.ngUnsubscribe$))
-      .subscribe((players) => (this.playerList = players));
-    this.courtList$
-      .pipe(takeUntil(this.ngUnsubscribe$))
-      .subscribe((courts) => (this.courtList = courts));
   }
 
   getWaitingPlayers() {
@@ -70,12 +61,12 @@ export class MatchmakingService {
       this.linkedPlayersService.removeLinkedPlayerById(playerId);
     }
   }
-  shuffleArray(array: any[]) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-  }
+  // shuffleArray(array: any[]) {
+  //   for (let i = array.length - 1; i > 0; i--) {
+  //     const j = Math.floor(Math.random() * (i + 1));
+  //     [array[i], array[j]] = [array[j], array[i]];
+  //   }
+  // }
   // TODO: implement matchmaking
   matchmake(waitingPlayers: Player[], numberOfPlayersToMatchmake: number) {
     // const matchmakingQueuedPlayers = this.matchmakingQueuedPlayers$.getValue();
@@ -233,58 +224,54 @@ export class MatchmakingService {
     // this.matchmakingQueuedPlayers$.next(matchmakingQueuedPlayers);
   }
   cycleCourt(court: Court) {
-    // if there are players on the court, move them all to the bottom of the waiting players list and update the court list
-    if (court.players.length > 0) {
-      let waitingPlayers = this.waitingPlayers$.getValue();
-      court.players.forEach((player) => waitingPlayers.push(player));
-      this.waitingPlayers$.next(waitingPlayers);
-
-      this.courtControllerService.updateCourt({ ...court, players: [] });
-      return;
-    }
-
-    // get first waiting group
-    const matchmakingQueuedGroups = this.matchmakingQueuedGroups$.getValue();
-    const nextGroup = matchmakingQueuedGroups[0];
-    if (!nextGroup) {
-      alert('Error getting next group: no group on waiting group list');
-      return;
-    }
-    // add first waiting group to court and remove them from waiting group
-    const courts = this.courtList$.getValue();
-    const updatedCourts = courts.map((c) => {
-      if (c.courtNumber === court.courtNumber) {
-        return {
-          players: nextGroup,
-          courtNumber: court.courtNumber,
-        };
-      }
-      return c;
-    });
-    this.courtList$.next(updatedCourts);
-
-    // remove the players from the waiting players list
-    let waitingPlayers = this.waitingPlayers$.getValue();
-    const newWaitingPlayers = waitingPlayers.filter((player) => {
-      return !nextGroup.find((p) => p.id === player.id);
-    });
-    this.waitingPlayers$.next(newWaitingPlayers);
-
-    // update waiting duration for each player
-    const updatedWaitingPlayers = this.waitingPlayers$.getValue();
-    const waitingDuration = this.waitingDuration$.getValue();
-    updatedWaitingPlayers.forEach((player) => {
-      if (waitingDuration.has(player.id)) {
-        const { waitPeriod } = waitingDuration.get(player.id) as {
-          player: Player;
-          waitPeriod: number;
-        };
-        waitingDuration.set(player.id, { player, waitPeriod: waitPeriod + 1 });
-      } else {
-        waitingDuration.set(player.id, { player, waitPeriod: 1 });
-      }
-    });
-    this.waitingDuration$.next(waitingDuration);
+    // // if there are players on the court, move them all to the bottom of the waiting players list and update the court list
+    // if (court.players.length > 0) {
+    //   let waitingPlayers = this.waitingPlayers$.getValue();
+    //   court.players.forEach((player) => waitingPlayers.push(player));
+    //   this.waitingPlayers$.next(waitingPlayers);
+    //   this.courtControllerService.updateCourt({ ...court, players: [] });
+    //   return;
+    // }
+    // // get first waiting group
+    // const matchmakingQueuedGroups = this.matchmakingQueuedGroups$.getValue();
+    // const nextGroup = matchmakingQueuedGroups[0];
+    // if (!nextGroup) {
+    //   alert('Error getting next group: no group on waiting group list');
+    //   return;
+    // }
+    // // add first waiting group to court and remove them from waiting group
+    // const courts = this.courtList$.getValue();
+    // const updatedCourts = courts.map((c) => {
+    //   if (c.courtNumber === court.courtNumber) {
+    //     return {
+    //       players: nextGroup,
+    //       courtNumber: court.courtNumber,
+    //     };
+    //   }
+    //   return c;
+    // });
+    // this.courtList$.next(updatedCourts);
+    // // remove the players from the waiting players list
+    // let waitingPlayers = this.waitingPlayers$.getValue();
+    // const newWaitingPlayers = waitingPlayers.filter((player) => {
+    //   return !nextGroup.find((p) => p.id === player.id);
+    // });
+    // this.waitingPlayers$.next(newWaitingPlayers);
+    // // update waiting duration for each player
+    // const updatedWaitingPlayers = this.waitingPlayers$.getValue();
+    // const waitingDuration = this.waitingDuration$.getValue();
+    // updatedWaitingPlayers.forEach((player) => {
+    //   if (waitingDuration.has(player.id)) {
+    //     const { waitPeriod } = waitingDuration.get(player.id) as {
+    //       player: Player;
+    //       waitPeriod: number;
+    //     };
+    //     waitingDuration.set(player.id, { player, waitPeriod: waitPeriod + 1 });
+    //   } else {
+    //     waitingDuration.set(player.id, { player, waitPeriod: 1 });
+    //   }
+    // });
+    // this.waitingDuration$.next(waitingDuration);
   }
   undoCourt(court: Court) {
     // TODO: implement undo court

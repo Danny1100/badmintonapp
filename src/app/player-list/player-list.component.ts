@@ -2,7 +2,6 @@ import { Component, HostListener } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Player } from '../player/services/player.service';
 import { PlayerListService } from './player-list-service/player-list.service';
-import { CourtControllerService } from '../court-controller/court-controller.service';
 import { MatchmakingService } from '../matchmaking/matchmaking.service';
 import { PlayerComponent } from '../player/player.component';
 import { AsyncPipe } from '@angular/common';
@@ -21,7 +20,6 @@ export class PlayerListComponent {
 
   constructor(
     private playerListService: PlayerListService,
-    private courtControllerService: CourtControllerService,
     private matchmakingService: MatchmakingService,
   ) {}
 

@@ -10,17 +10,16 @@ export interface Court {
 }
 
 @Component({
-    selector: 'app-court',
-    templateUrl: './court.component.html',
-    styleUrls: ['./court.component.css'],
-    standalone: true,
-    imports: [PlayerComponent],
+  selector: 'app-court',
+  templateUrl: './court.component.html',
+  styleUrls: ['./court.component.css'],
+  standalone: true,
+  imports: [PlayerComponent],
 })
 export class CourtComponent {
   @Input({ required: true }) courtNumber!: number;
   @Input({ required: true }) players!: Player[];
   @Input() showButtons = true;
-  @Output() onNextCourt = new EventEmitter();
   disableNextCourtButton = true;
 
   constructor(
@@ -30,19 +29,19 @@ export class CourtComponent {
 
   cycleCourt() {
     if (this.disableNextCourtButton) return;
-    this.onNextCourt.emit();
     this.matchmakingService.cycleCourt({
       courtNumber: this.courtNumber,
       players: this.players,
     });
   }
-  undo() {
-    if (this.players.length === 0) return;
-    this.matchmakingService.undoCourt({
-      courtNumber: this.courtNumber,
-      players: this.players,
-    });
-  }
+  // TODO: implement undo functionality
+  // undo() {
+  //   if (this.players.length === 0) return;
+  //   this.matchmakingService.undoCourt({
+  //     courtNumber: this.courtNumber,
+  //     players: this.players,
+  //   });
+  // }
   removeCourt() {
     if (this.players.length > 0) {
       alert('Cannot remove court, there are still people playing');
