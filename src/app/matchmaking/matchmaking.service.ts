@@ -20,6 +20,9 @@ export class MatchmakingService {
     this.courtControllerService.getCourts();
   private matchmakingQueuedGroups$: BehaviorSubject<Player[][]> =
     new BehaviorSubject<Player[][]>([]);
+  private nonMatchmadePlayers$: BehaviorSubject<Player[]> = new BehaviorSubject<
+    Player[]
+  >([]);
 
   private waitingDuration$: BehaviorSubject<
     Map<number, { player: Player; waitPeriod: number }>
@@ -39,11 +42,26 @@ export class MatchmakingService {
         waitingPlayers.push(player);
         this.waitingPlayers$.next(waitingPlayers);
       });
-    // whenever waiting players list is updated, update matchmaking queue to have the same players
+    // whenever waiting players list is updated, update nonMatchmadePlayers$ and matchmakingQueuedGroups$ accordingly
     this.waitingPlayers$
       .pipe(takeUntil(this.ngUnsubscribe$))
       .subscribe((waitingPlayers) => {
-        this.matchmakingQueuedGroups$.next(chunkArray(waitingPlayers, 4));
+        const matchmakingQueuedGroups =
+          this.matchmakingQueuedGroups$.getValue();
+
+        const newMatchmakingQueuedGroups =
+          this.getUpdatedMatchmakingQueuedGroups(
+            matchmakingQueuedGroups,
+            waitingPlayers,
+          );
+        const newNonMatchmadePlayers = this.getUpdatedNonMatchmadePlayers(
+          matchmakingQueuedGroups,
+          waitingPlayers,
+        );
+
+        // TODO: when matchmakingQueuedGroups is updated, adjust ther number of empty courts padding in matchmakingQueuedGroups
+        this.matchmakingQueuedGroups$.next(newMatchmakingQueuedGroups);
+        this.nonMatchmadePlayers$.next(newNonMatchmadePlayers);
       });
   }
 
@@ -53,8 +71,53 @@ export class MatchmakingService {
   getMatchmakingQueuedGroups() {
     return this.matchmakingQueuedGroups$;
   }
+  getNonMatchmadePlayers() {
+    return this.nonMatchmadePlayers$;
+  }
   getWaitingDuration() {
     return this.waitingDuration$;
+  }
+  getUpdatedMatchmakingQueuedGroups(
+    matchmakingQueuedGroups: Player[][],
+    waitingPlayers: Player[],
+  ): Player[][] {
+    const newMatchmakingQueuedGroups: Player[][] = [];
+
+    // for each player in matchmakingQueuedGroups, if they are in waitingPlayers, they are added to newMatchmakingQueuedGroups. This accounts for players removed from waitingPlayers
+    matchmakingQueuedGroups.forEach((group) => {
+      const newGroup: Player[] = [];
+      group.forEach((player) => {
+        const isInWaitingPlayers = waitingPlayers.some(
+          (p) => p.id === player.id,
+        );
+        if (isInWaitingPlayers) {
+          newGroup.push(player);
+        }
+      });
+      if (newGroup.length > 0) {
+        newMatchmakingQueuedGroups.push(newGroup);
+      }
+    });
+
+    return newMatchmakingQueuedGroups;
+  }
+  getUpdatedNonMatchmadePlayers(
+    matchmakingQueuedGroups: Player[][],
+    waitingPlayers: Player[],
+  ): Player[] {
+    const newNonMatchmadePlayers: Player[] = [];
+
+    // any waiting player that is not in matchmakingQueuedGroups is added to newNonMatchmadePlayers. This accounts for player added and removed from waitingPlayers
+    waitingPlayers.forEach((player) => {
+      const isInMatchmakingQueue = matchmakingQueuedGroups.some((group) =>
+        group.some((p) => p.id === player.id),
+      );
+      if (!isInMatchmakingQueue) {
+        newNonMatchmadePlayers.push(player);
+      }
+    });
+
+    return newNonMatchmadePlayers;
   }
   removeWaitingPlayer(playerId: number) {
     let waitingPlayers = this.waitingPlayers$.getValue();

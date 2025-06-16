@@ -53,18 +53,18 @@
           }
         </div>
       </div>
-      <div class="waiting-players-container">
-        @if ((waitingPlayers$ | async)?.length) {
-          <h2 class="mb-3">Waiting Players</h2>
+      <div class="non-matchmade-players-container">
+        @if ((nonMatchmadePlayers$ | async)?.length) {
+          <h2 class="mb-3">Not Queued Players</h2>
         }
-        <div class="waiting-players-list-container my-3 mx-3">
+        <div class="non-matchmade-players-list-container my-3 mx-3">
           @for (
-            player of waitingPlayers$ | async;
+            player of nonMatchmadePlayers$ | async;
             track player;
             let playerIndex = $index
           ) {
-            <div class="waiting-player mx-3 mb-2">
-              <p class="waiting-player-number">{{ playerIndex + 1 }}.</p>
+            <div class="non-matchmade-player mx-3 mb-2">
+              <p class="non-matchmade-player-number">{{ playerIndex + 1 }}.</p>
               <div>
                 <app-player
                   [id]="player.id"
