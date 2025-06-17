@@ -37,7 +37,7 @@
           ) {
             <div class="waiting-group mx-3 mb-3">
               <p class="waiting-group-number">{{ groupIndex + 1 }}.</p>
-              <div>
+              <div class="waiting-group-players-container">
                 @for (player of group; track player; let playerIndex = $index) {
                   <div class="waiting-group-list-item mb-2">
                     <app-player

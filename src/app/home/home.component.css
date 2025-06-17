@@ -16,6 +16,12 @@
   max-height: 30vw;
   align-content: flex-start;
 }
+.waiting-group-players-container {
+  background-color: rgb(227, 227, 227);
+  border-radius: 10px;
+  width: 200px;
+  height: 180px;
+}
 .waiting-group,
 .non-matchmade-player {
   display: flex;

@@ -5,7 +5,6 @@ import { PlayerListService } from '../player-list/player-list-service/player-lis
 import { CourtControllerService } from '../court-controller/court-controller.service';
 import { Court } from '../court/court.component';
 import { LinkedPlayersService } from '../linked-players/linked-players-service/linked-players.service';
-import { chunkArray } from './matchmaking.util';
 
 @Injectable({
   providedIn: 'root',
@@ -59,7 +58,6 @@ export class MatchmakingService {
           waitingPlayers,
         );
 
-        // TODO: when matchmakingQueuedGroups is updated, adjust ther number of empty courts padding in matchmakingQueuedGroups
         this.matchmakingQueuedGroups$.next(newMatchmakingQueuedGroups);
         this.nonMatchmadePlayers$.next(newNonMatchmadePlayers);
       });
@@ -84,20 +82,30 @@ export class MatchmakingService {
     const newMatchmakingQueuedGroups: Player[][] = [];
 
     // for each player in matchmakingQueuedGroups, if they are in waitingPlayers, they are added to newMatchmakingQueuedGroups. This accounts for players removed from waitingPlayers
-    matchmakingQueuedGroups.forEach((group) => {
-      const newGroup: Player[] = [];
-      group.forEach((player) => {
-        const isInWaitingPlayers = waitingPlayers.some(
-          (p) => p.id === player.id,
-        );
-        if (isInWaitingPlayers) {
-          newGroup.push(player);
+    matchmakingQueuedGroups
+      .filter((group) => group.length > 0)
+      .forEach((group) => {
+        const newGroup: Player[] = [];
+        group.forEach((player) => {
+          const isInWaitingPlayers = waitingPlayers.some(
+            (p) => p.id === player.id,
+          );
+          if (isInWaitingPlayers) {
+            newGroup.push(player);
+          }
+        });
+        if (newGroup.length > 0) {
+          newMatchmakingQueuedGroups.push(newGroup);
         }
       });
-      if (newGroup.length > 0) {
-        newMatchmakingQueuedGroups.push(newGroup);
-      }
-    });
+
+    const numberOfGroupsFromWaitingPlayers = Math.ceil(
+      waitingPlayers.length / 4,
+    );
+    const padding = 4;
+    for (let i = 0; i < numberOfGroupsFromWaitingPlayers + padding; i++) {
+      newMatchmakingQueuedGroups.push([]);
+    }
 
     return newMatchmakingQueuedGroups;
   }
