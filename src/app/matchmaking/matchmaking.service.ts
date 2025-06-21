@@ -99,13 +99,7 @@ export class MatchmakingService {
         }
       });
 
-    const numberOfGroupsFromWaitingPlayers = Math.ceil(
-      waitingPlayers.length / 4,
-    );
-    const padding = 4;
-    for (let i = 0; i < numberOfGroupsFromWaitingPlayers + padding; i++) {
-      newMatchmakingQueuedGroups.push([]);
-    }
+    newMatchmakingQueuedGroups.push([]); // add an empty group to the end of the queue to allow players to be added to a new group
 
     return newMatchmakingQueuedGroups;
   }

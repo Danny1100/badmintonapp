@@ -44,7 +44,6 @@ export class HomeComponent {
 
   drop(event: CdkDragDrop<Player[]>) {
     // TODO: reorder nonmatchmadeplayers when transferring to that list
-    // TODO: update matchmakingQueuedGroups padding
     if (event === null || event.previousContainer === event.container) return;
     transferArrayItem(
       event.previousContainer.data ?? [],
@@ -52,5 +51,11 @@ export class HomeComponent {
       event.previousIndex,
       event.currentIndex,
     );
+    const newMatchmakingQueuedGroups =
+      this.matchmakingService.getUpdatedMatchmakingQueuedGroups(
+        this.matchmakingQueuedGroups$.getValue(),
+        this.matchmakingService.getWaitingPlayers().getValue(),
+      );
+    this.matchmakingQueuedGroups$.next(newMatchmakingQueuedGroups);
   }
 }
