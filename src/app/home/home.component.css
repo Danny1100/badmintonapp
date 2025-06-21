@@ -17,6 +17,11 @@
   align-content: flex-start;
 }
 .waiting-group-players-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
   background-color: rgb(227, 227, 227);
   border-radius: 10px;
   width: 200px;
@@ -31,6 +36,12 @@
 .non-matchmade-player-number {
   margin-top: 2px;
   width: 20px;
+}
+.player-container {
+  cursor: move;
+}
+.cdk-drag-preview p {
+  display: none;
 }
 
 /* TODO: add this back

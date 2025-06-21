@@ -7,13 +7,24 @@ import { MatchmakingService } from '../matchmaking/matchmaking.service';
 import { AddCourtComponent } from '../add-court/add-court.component';
 import { PlayerComponent } from '../player/player.component';
 import { AsyncPipe } from '@angular/common';
+import {
+  CdkDragDrop,
+  DragDropModule,
+  transferArrayItem,
+} from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
   standalone: true,
-  imports: [CourtComponent, AddCourtComponent, PlayerComponent, AsyncPipe],
+  imports: [
+    CourtComponent,
+    AddCourtComponent,
+    PlayerComponent,
+    AsyncPipe,
+    DragDropModule,
+  ],
 })
 export class HomeComponent {
   courts$: BehaviorSubject<Court[]> = this.courtControllerService.getCourts();
@@ -29,5 +40,17 @@ export class HomeComponent {
 
   @HostListener('window:beforeunload', ['$event']) onRefresh(event: Event) {
     event.preventDefault();
+  }
+
+  drop(event: CdkDragDrop<Player[]>) {
+    // TODO: reorder nonmatchmadeplayers when transferring to that list
+    // TODO: update matchmakingQueuedGroups padding
+    if (event === null || event.previousContainer === event.container) return;
+    transferArrayItem(
+      event.previousContainer.data ?? [],
+      event.container.data ?? [],
+      event.previousIndex,
+      event.currentIndex,
+    );
   }
 }

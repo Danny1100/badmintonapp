@@ -25,55 +25,83 @@
       <div class="run-matchmaking-container mb-3">
         <app-run-matchmaking></app-run-matchmaking>
       </div> -->
-      <div class="queued-groups-container">
-        @if ((matchmakingQueuedGroups$ | async)?.length) {
-          <h2 class="mb-3">Queued Groups</h2>
-        }
-        <div class="queued-groups-list-container my-3 mx-3">
-          @for (
-            group of matchmakingQueuedGroups$ | async;
-            track group;
-            let groupIndex = $index
-          ) {
-            <div class="waiting-group mx-3 mb-3">
-              <p class="waiting-group-number">{{ groupIndex + 1 }}.</p>
-              <div class="waiting-group-players-container">
-                @for (player of group; track player; let playerIndex = $index) {
-                  <div class="waiting-group-list-item mb-2">
-                    <app-player
-                      [id]="player.id"
-                      [name]="player.name"
-                      [skillId]="player.skillId"
-                    ></app-player>
-                  </div>
-                }
-              </div>
-            </div>
-            <hr />
+      <div cdkDropListGroup>
+        <div class="queued-groups-container">
+          @if ((matchmakingQueuedGroups$ | async)?.length) {
+            <h2 class="mb-3">Queued Groups</h2>
           }
+          <div class="queued-groups-list-container my-3 mx-3">
+            @for (
+              group of matchmakingQueuedGroups$ | async;
+              track group;
+              let groupIndex = $index
+            ) {
+              <div class="waiting-group mx-3 mb-3">
+                <p class="waiting-group-number">{{ groupIndex + 1 }}.</p>
+                <div
+                  class="waiting-group-players-container"
+                  cdkDropList
+                  [cdkDropListData]="group"
+                  (cdkDropListDropped)="drop($event)"
+                  cdkDropListSortingDisabled
+                >
+                  @for (
+                    player of group;
+                    track player;
+                    let playerIndex = $index
+                  ) {
+                    <div class="waiting-group-list-item" cdkDrag>
+                      <div
+                        class="dragging-placeholder"
+                        *cdkDragPlaceholder
+                      ></div>
+                      <div class="player-container">
+                        <app-player
+                          [id]="player.id"
+                          [name]="player.name"
+                          [skillId]="player.skillId"
+                        ></app-player>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+              <hr />
+            }
+          </div>
         </div>
-      </div>
-      <div class="non-matchmade-players-container">
-        @if ((nonMatchmadePlayers$ | async)?.length) {
-          <h2 class="mb-3">Not Queued Players</h2>
-        }
-        <div class="non-matchmade-players-list-container my-3 mx-3">
-          @for (
-            player of nonMatchmadePlayers$ | async;
-            track player;
-            let playerIndex = $index
-          ) {
-            <div class="non-matchmade-player mx-3 mb-2">
-              <p class="non-matchmade-player-number">{{ playerIndex + 1 }}.</p>
-              <div>
-                <app-player
-                  [id]="player.id"
-                  [name]="player.name"
-                  [skillId]="player.skillId"
-                ></app-player>
-              </div>
-            </div>
+        <div class="non-matchmade-players-container">
+          @if ((nonMatchmadePlayers$ | async)?.length) {
+            <h2 class="mb-3">Not Queued Players</h2>
           }
+          <div
+            class="non-matchmade-players-list-container my-3 mx-3"
+            cdkDropList
+            cdkDropListOrientation="mixed"
+            [cdkDropListData]="(nonMatchmadePlayers$ | async) ?? []"
+            (cdkDropListDropped)="drop($event)"
+            cdkDropListSortingDisabled
+          >
+            @for (
+              player of nonMatchmadePlayers$ | async;
+              track player;
+              let playerIndex = $index
+            ) {
+              <div class="non-matchmade-player mx-3" cdkDrag>
+                <div class="dragging-placeholder" *cdkDragPlaceholder></div>
+                <p class="non-matchmade-player-number">
+                  {{ playerIndex + 1 }}.
+                </p>
+                <div class="player-container">
+                  <app-player
+                    [id]="player.id"
+                    [name]="player.name"
+                    [skillId]="player.skillId"
+                  ></app-player>
+                </div>
+              </div>
+            }
+          </div>
         </div>
       </div>
     </div>
