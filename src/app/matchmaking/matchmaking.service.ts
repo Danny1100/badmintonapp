@@ -295,40 +295,44 @@ export class MatchmakingService {
     // this.matchmakingQueuedPlayers$.next(matchmakingQueuedPlayers);
   }
   cycleCourt(court: Court) {
-    // // if there are players on the court, move them all to the bottom of the waiting players list and update the court list
-    // if (court.players.length > 0) {
-    //   let waitingPlayers = this.waitingPlayers$.getValue();
-    //   court.players.forEach((player) => waitingPlayers.push(player));
-    //   this.waitingPlayers$.next(waitingPlayers);
-    //   this.courtControllerService.updateCourt({ ...court, players: [] });
-    //   return;
-    // }
-    // // get first waiting group
-    // const matchmakingQueuedGroups = this.matchmakingQueuedGroups$.getValue();
-    // const nextGroup = matchmakingQueuedGroups[0];
-    // if (!nextGroup) {
-    //   alert('Error getting next group: no group on waiting group list');
-    //   return;
-    // }
-    // // add first waiting group to court and remove them from waiting group
-    // const courts = this.courtList$.getValue();
-    // const updatedCourts = courts.map((c) => {
-    //   if (c.courtNumber === court.courtNumber) {
-    //     return {
-    //       players: nextGroup,
-    //       courtNumber: court.courtNumber,
-    //     };
-    //   }
-    //   return c;
-    // });
-    // this.courtList$.next(updatedCourts);
-    // // remove the players from the waiting players list
-    // let waitingPlayers = this.waitingPlayers$.getValue();
-    // const newWaitingPlayers = waitingPlayers.filter((player) => {
-    //   return !nextGroup.find((p) => p.id === player.id);
-    // });
-    // this.waitingPlayers$.next(newWaitingPlayers);
-    // // update waiting duration for each player
+    // if there are players on the court, move them all to the bottom of the waiting players list and update the court list
+    if (court.players.length > 0) {
+      let waitingPlayers = this.waitingPlayers$.getValue();
+      court.players.forEach((player) => waitingPlayers.push(player));
+      this.waitingPlayers$.next(waitingPlayers);
+      this.courtControllerService.updateCourt({ ...court, players: [] });
+      return;
+    }
+    // get first waiting group
+    const matchmakingQueuedGroups = this.matchmakingQueuedGroups$.getValue();
+    const nextGroup = matchmakingQueuedGroups[0];
+    if (!nextGroup) {
+      alert('Error getting next group: no group on waiting group list');
+      return;
+    }
+    if (nextGroup.length !== 4) {
+      alert('Error getting next group: group needs 4 people');
+      return;
+    }
+    // add first waiting group to court and remove them from waiting group
+    const courts = this.courtList$.getValue();
+    const updatedCourts = courts.map((c) => {
+      if (c.courtNumber === court.courtNumber) {
+        return {
+          players: nextGroup,
+          courtNumber: court.courtNumber,
+        };
+      }
+      return c;
+    });
+    this.courtList$.next(updatedCourts);
+    // remove the players from the waiting players list
+    let waitingPlayers = this.waitingPlayers$.getValue();
+    const newWaitingPlayers = waitingPlayers.filter((player) => {
+      return !nextGroup.find((p) => p.id === player.id);
+    });
+    this.waitingPlayers$.next(newWaitingPlayers);
+    // TODO: update waiting duration for each player
     // const updatedWaitingPlayers = this.waitingPlayers$.getValue();
     // const waitingDuration = this.waitingDuration$.getValue();
     // updatedWaitingPlayers.forEach((player) => {
