@@ -43,8 +43,12 @@ export class HomeComponent {
   }
 
   drop(event: CdkDragDrop<Player[]>) {
-    // TODO: reorder nonmatchmadeplayers when transferring to that list
     if (event === null || event.previousContainer === event.container) return;
+    
+    // ensures max number of players in a matchmadeGroup is 4
+    const targetElement: HTMLElement = event.container.element.nativeElement;
+    if (targetElement.className.includes("waiting-group-players-container") && event.container.data.length >= 4) return;
+    
     transferArrayItem(
       event.previousContainer.data ?? [],
       event.container.data ?? [],
@@ -57,5 +61,8 @@ export class HomeComponent {
         this.matchmakingService.getWaitingPlayers().getValue(),
       );
     this.matchmakingQueuedGroups$.next(newMatchmakingQueuedGroups);
+
+    const newNonMatchmadePlayers = this.matchmakingService.getUpdatedNonMatchmadePlayers(this.matchmakingQueuedGroups$.getValue(), this.matchmakingService.getWaitingPlayers().getValue());
+    this.nonMatchmadePlayers$.next(newNonMatchmadePlayers)
   }
 }
