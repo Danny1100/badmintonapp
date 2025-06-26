@@ -1,5 +1,5 @@
 .court-container {
-  --court-width: 240px;
+  --court-width: 200px;
   width: var(--court-width);
   height: 300px;
   display: flex;
