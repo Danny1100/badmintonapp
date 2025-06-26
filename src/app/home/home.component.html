@@ -7,7 +7,7 @@
   <body>
     <div class="container-fluid p-3">
       <div class="court-list-container">
-        @for (court of courts$ | async; track court) {
+        @for (court of courts$ | async; track court.courtNumber) {
           <div>
             <div class="court-container mb-3">
               <app-court
@@ -47,7 +47,7 @@
                 >
                   @for (
                     player of group;
-                    track player;
+                    track player.id;
                     let playerIndex = $index
                   ) {
                     <div class="waiting-group-list-item" cdkDrag>
@@ -84,7 +84,7 @@
           >
             @for (
               player of nonMatchmadePlayers$ | async;
-              track player;
+              track player.id;
               let playerIndex = $index
             ) {
               <div class="non-matchmade-player mx-3" cdkDrag>
@@ -92,7 +92,10 @@
                 <p class="non-matchmade-player-number">
                   {{ playerIndex + 1 }}.
                 </p>
-                <div class="player-container">
+                <div
+                  class="player-container"
+                  (dblclick)="moveNonMatchmadePlayerToMatchmakingQueue(player)"
+                >
                   <app-player
                     [id]="player.id"
                     [name]="player.name"
