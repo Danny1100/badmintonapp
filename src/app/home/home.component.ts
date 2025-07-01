@@ -13,6 +13,7 @@ import {
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
 import {
+  MatchmakingGroup,
   PlayersSortOption,
   PlayersSortOptionFormObject,
 } from '../matchmaking/matchmaking.util';
@@ -32,7 +33,7 @@ import {
 })
 export class HomeComponent {
   courts$: BehaviorSubject<Court[]> = this.courtControllerService.getCourts();
-  matchmakingQueuedGroups$: BehaviorSubject<Player[][]> =
+  matchmakingQueuedGroups$: BehaviorSubject<MatchmakingGroup[]> =
     this.matchmakingService.getMatchmakingQueuedGroups();
   nonMatchmadePlayers$: BehaviorSubject<Player[]> =
     this.matchmakingService.getNonMatchmadePlayers();

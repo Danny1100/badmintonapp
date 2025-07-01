@@ -33,7 +33,7 @@
           <div class="queued-groups-list-container my-3 mx-3">
             @for (
               group of matchmakingQueuedGroups$ | async;
-              track group;
+              track group.id;
               let groupIndex = $index
             ) {
               <div class="waiting-group mx-3 mb-3">
@@ -41,12 +41,12 @@
                 <div
                   class="waiting-group-players-container"
                   cdkDropList
-                  [cdkDropListData]="group"
+                  [cdkDropListData]="group.players"
                   (cdkDropListDropped)="drop($event)"
                   cdkDropListSortingDisabled
                 >
                   @for (
-                    player of group;
+                    player of group.players;
                     track player.id;
                     let playerIndex = $index
                   ) {

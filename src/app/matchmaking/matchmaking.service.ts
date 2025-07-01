@@ -6,6 +6,8 @@ import { CourtControllerService } from '../court-controller/court-controller.ser
 import { Court } from '../court/court.component';
 import { LinkedPlayersService } from '../linked-players/linked-players-service/linked-players.service';
 import {
+  getNewGroup,
+  MatchmakingGroup,
   PlayersSortOption,
   PlayersSortOptionFormObject,
 } from './matchmaking.util';
@@ -22,8 +24,8 @@ export class MatchmakingService {
   private courtList$: BehaviorSubject<Court[]> =
     this.courtControllerService.getCourts();
 
-  private matchmakingQueuedGroups$: BehaviorSubject<Player[][]> =
-    new BehaviorSubject<Player[][]>([]);
+  private matchmakingQueuedGroups$: BehaviorSubject<MatchmakingGroup[]> =
+    new BehaviorSubject<MatchmakingGroup[]>([]);
   private nonMatchmadePlayers$: BehaviorSubject<Player[]> = new BehaviorSubject<
     Player[]
   >([]);
@@ -101,35 +103,35 @@ export class MatchmakingService {
     return this.selectedNonMatchmadePlayersSortOption$;
   }
   getUpdatedMatchmakingQueuedGroups(
-    matchmakingQueuedGroups: Player[][],
+    matchmakingQueuedGroups: MatchmakingGroup[],
     waitingPlayers: Player[],
-  ): Player[][] {
-    const newMatchmakingQueuedGroups: Player[][] = [];
+  ): MatchmakingGroup[] {
+    const newMatchmakingQueuedGroups: MatchmakingGroup[] = [];
 
     // for each player in matchmakingQueuedGroups, if they are in waitingPlayers, they are added to newMatchmakingQueuedGroups. This accounts for players removed from waitingPlayers
     matchmakingQueuedGroups
-      .filter((group) => group.length > 0)
+      .filter((group) => group.players.length > 0)
       .forEach((group) => {
-        const newGroup: Player[] = [];
-        group.forEach((player) => {
+        const newGroup = getNewGroup();
+        group.players.forEach((player) => {
           const isInWaitingPlayers = waitingPlayers.some(
             (p) => p.id === player.id,
           );
           if (isInWaitingPlayers) {
-            newGroup.push(player);
+            newGroup.players.push(player);
           }
         });
-        if (newGroup.length > 0) {
+        if (newGroup.players.length > 0) {
           newMatchmakingQueuedGroups.push(newGroup);
         }
       });
 
-    newMatchmakingQueuedGroups.push([]); // add an empty group to the end of the queue to allow players to be added to a new group
+    newMatchmakingQueuedGroups.push(getNewGroup()); // add an empty group to the end of the queue to allow players to be added to a new group
 
     return newMatchmakingQueuedGroups;
   }
   getUpdatedNonMatchmadePlayers(
-    matchmakingQueuedGroups: Player[][],
+    matchmakingQueuedGroups: MatchmakingGroup[],
     waitingPlayers: Player[],
     sortOption: PlayersSortOption,
   ): Player[] {
@@ -138,7 +140,7 @@ export class MatchmakingService {
     // any waiting player that is not in matchmakingQueuedGroups is added to newNonMatchmadePlayers. This accounts for player added and removed from waitingPlayers
     waitingPlayers.forEach((player) => {
       const isInMatchmakingQueue = matchmakingQueuedGroups.some((group) =>
-        group.some((p) => p.id === player.id),
+        group.players.some((p) => p.id === player.id),
       );
       if (!isInMatchmakingQueue) {
         newNonMatchmadePlayers.push(player);
@@ -169,9 +171,9 @@ export class MatchmakingService {
     const matchmakingQueuedGroups = this.matchmakingQueuedGroups$.getValue();
     for (let i = 0; i < matchmakingQueuedGroups.length; i++) {
       const group = matchmakingQueuedGroups[i];
-      if (group.length < 4) {
+      if (group.players.length < 4) {
         // add player to the first group with less than 4 players
-        group.push(player);
+        group.players.push(player);
         this.matchmakingQueuedGroups$.next(matchmakingQueuedGroups);
         const newMatchmakingQueuedGroups =
           this.getUpdatedMatchmakingQueuedGroups(
@@ -382,7 +384,7 @@ export class MatchmakingService {
       alert('Error getting next group: no group on waiting group list');
       return;
     }
-    if (nextGroup.length !== 4) {
+    if (nextGroup.players.length !== 4) {
       alert('Error getting next group: group needs 4 people');
       return;
     }
@@ -391,7 +393,7 @@ export class MatchmakingService {
     const updatedCourts = courts.map((c) => {
       if (c.courtNumber === court.courtNumber) {
         return {
-          players: nextGroup,
+          players: nextGroup.players,
           courtNumber: court.courtNumber,
         };
       }
@@ -401,7 +403,7 @@ export class MatchmakingService {
     // remove the players from the waiting players list
     let waitingPlayers = this.waitingPlayers$.getValue();
     const newWaitingPlayers = waitingPlayers.filter((player) => {
-      return !nextGroup.find((p) => p.id === player.id);
+      return !nextGroup.players.find((p) => p.id === player.id);
     });
     this.waitingPlayers$.next(newWaitingPlayers);
     // TODO: update waiting duration for each player
