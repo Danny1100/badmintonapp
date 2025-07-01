@@ -5,6 +5,10 @@ import { PlayerListService } from '../player-list/player-list-service/player-lis
 import { CourtControllerService } from '../court-controller/court-controller.service';
 import { Court } from '../court/court.component';
 import { LinkedPlayersService } from '../linked-players/linked-players-service/linked-players.service';
+import {
+  PlayersSortOption,
+  PlayersSortOptionFormObject,
+} from './matchmaking.util';
 
 @Injectable({
   providedIn: 'root',
@@ -17,11 +21,17 @@ export class MatchmakingService {
   >([]);
   private courtList$: BehaviorSubject<Court[]> =
     this.courtControllerService.getCourts();
+
   private matchmakingQueuedGroups$: BehaviorSubject<Player[][]> =
     new BehaviorSubject<Player[][]>([]);
   private nonMatchmadePlayers$: BehaviorSubject<Player[]> = new BehaviorSubject<
     Player[]
   >([]);
+  private selectedNonMatchmadePlayersSortOption$ =
+    new BehaviorSubject<PlayersSortOptionFormObject>({
+      label: 'Name',
+      value: PlayersSortOption.Name,
+    });
 
   private waitingDuration$: BehaviorSubject<
     Map<number, { player: Player; waitPeriod: number }>
@@ -56,9 +66,21 @@ export class MatchmakingService {
         const newNonMatchmadePlayers = this.getUpdatedNonMatchmadePlayers(
           matchmakingQueuedGroups,
           waitingPlayers,
+          this.selectedNonMatchmadePlayersSortOption$.getValue().value,
         );
 
         this.matchmakingQueuedGroups$.next(newMatchmakingQueuedGroups);
+        this.nonMatchmadePlayers$.next(newNonMatchmadePlayers);
+      });
+    // whenever selected player sort option is changed, sort update the non-matchmade player list
+    this.selectedNonMatchmadePlayersSortOption$
+      .pipe(takeUntil(this.ngUnsubscribe$))
+      .subscribe((selectedSortOption) => {
+        const newNonMatchmadePlayers = this.getUpdatedNonMatchmadePlayers(
+          this.matchmakingQueuedGroups$.getValue(),
+          this.waitingPlayers$.getValue(),
+          selectedSortOption.value,
+        );
         this.nonMatchmadePlayers$.next(newNonMatchmadePlayers);
       });
   }
@@ -74,6 +96,9 @@ export class MatchmakingService {
   }
   getWaitingDuration() {
     return this.waitingDuration$;
+  }
+  getSelectedNonMatchmadePlayersSortOptionStream() {
+    return this.selectedNonMatchmadePlayersSortOption$;
   }
   getUpdatedMatchmakingQueuedGroups(
     matchmakingQueuedGroups: Player[][],
@@ -106,8 +131,9 @@ export class MatchmakingService {
   getUpdatedNonMatchmadePlayers(
     matchmakingQueuedGroups: Player[][],
     waitingPlayers: Player[],
+    sortOption: PlayersSortOption,
   ): Player[] {
-    const newNonMatchmadePlayers: Player[] = [];
+    let newNonMatchmadePlayers: Player[] = [];
 
     // any waiting player that is not in matchmakingQueuedGroups is added to newNonMatchmadePlayers. This accounts for player added and removed from waitingPlayers
     waitingPlayers.forEach((player) => {
@@ -118,6 +144,24 @@ export class MatchmakingService {
         newNonMatchmadePlayers.push(player);
       }
     });
+
+    if (sortOption === PlayersSortOption.Waiting) return newNonMatchmadePlayers;
+    else if (sortOption === PlayersSortOption.Name) {
+      newNonMatchmadePlayers = newNonMatchmadePlayers.sort((player1, player2) =>
+        player1.name.localeCompare(player2.name),
+      );
+    } else if (sortOption === PlayersSortOption.SkillLevel) {
+      newNonMatchmadePlayers = newNonMatchmadePlayers.sort(
+        (player1, player2) => {
+          if (player1.skillId !== player2.skillId) {
+            return player1.skillId - player2.skillId;
+          }
+          return player1.name.localeCompare(player2.name);
+        },
+      );
+    } else {
+      throw new Error('Invalid sortOption when updating nonMatchmadePlayers');
+    }
 
     return newNonMatchmadePlayers;
   }

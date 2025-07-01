@@ -12,6 +12,7 @@ export enum PlayerSkillLevelDesc {
   Average = 'Average',
   Amateur = 'Amateur',
   New = 'New',
+  Organiser = 'Organiser',
 }
 export enum PlayerSkillLevelColour {
   Cracked = '#f30da9',
@@ -19,7 +20,8 @@ export enum PlayerSkillLevelColour {
   Good = '#f3af0d',
   Average = '#0db2f3',
   Amateur = '#36c513',
-  New = '#ffaaea',
+  New = '#ecfc05',
+  Organiser = '#00fcf0',
 }
 export interface PlayerSkillData {
   skillLevel: PlayerSkillLevelDesc;
@@ -55,6 +57,10 @@ export class PlayerService {
     {
       skillLevel: PlayerSkillLevelDesc.New,
       colour: PlayerSkillLevelColour.New,
+    },
+    {
+      skillLevel: PlayerSkillLevelDesc.Organiser,
+      colour: PlayerSkillLevelColour.Organiser,
     },
   ];
 

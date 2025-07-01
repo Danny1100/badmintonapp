@@ -12,6 +12,10 @@ import {
   DragDropModule,
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
+import {
+  PlayersSortOption,
+  PlayersSortOptionFormObject,
+} from '../matchmaking/matchmaking.util';
 
 @Component({
   selector: 'app-home',
@@ -32,6 +36,14 @@ export class HomeComponent {
     this.matchmakingService.getMatchmakingQueuedGroups();
   nonMatchmadePlayers$: BehaviorSubject<Player[]> =
     this.matchmakingService.getNonMatchmadePlayers();
+
+  sortPlayerOptions: PlayersSortOptionFormObject[] = [
+    { label: 'Name', value: PlayersSortOption.Name },
+    { label: 'Wait Time', value: PlayersSortOption.Waiting },
+    { label: 'Skill Level', value: PlayersSortOption.SkillLevel },
+  ];
+  selectedNonMatchmadePlayersSortOption$ =
+    this.matchmakingService.getSelectedNonMatchmadePlayersSortOptionStream();
 
   constructor(
     private courtControllerService: CourtControllerService,
@@ -70,10 +82,14 @@ export class HomeComponent {
       this.matchmakingService.getUpdatedNonMatchmadePlayers(
         this.matchmakingQueuedGroups$.getValue(),
         this.matchmakingService.getWaitingPlayers().getValue(),
+        this.selectedNonMatchmadePlayersSortOption$.getValue().value,
       );
     this.nonMatchmadePlayers$.next(newNonMatchmadePlayers);
   }
   moveNonMatchmadePlayerToMatchmakingQueue(player: Player) {
     this.matchmakingService.moveNonMatchmadePlayerToMatchmakingQueue(player);
+  }
+  selectSortOption(sortOptionFormObject: PlayersSortOptionFormObject) {
+    this.selectedNonMatchmadePlayersSortOption$.next(sortOptionFormObject);
   }
 }
