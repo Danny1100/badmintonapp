@@ -1,7 +1,7 @@
 import { Component, HostListener } from '@angular/core';
 import { Player } from '../player/services/player.service';
 import { Court, CourtComponent } from '../court/court.component';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
 import { CourtControllerService } from '../court-controller/court-controller.service';
 import { MatchmakingService } from '../matchmaking/matchmaking.service';
 import { AddCourtComponent } from '../add-court/add-court.component';
@@ -45,6 +45,10 @@ export class HomeComponent {
   ];
   selectedNonMatchmadePlayersSortOption$ =
     this.matchmakingService.getSelectedNonMatchmadePlayersSortOptionStream();
+
+  connectedPlayerDropLists: string[] = [];
+
+  private ngUnsubscribe$: Subject<boolean> = new Subject();
 
   constructor(
     private courtControllerService: CourtControllerService,
@@ -92,5 +96,16 @@ export class HomeComponent {
   }
   selectSortOption(sortOptionFormObject: PlayersSortOptionFormObject) {
     this.selectedNonMatchmadePlayersSortOption$.next(sortOptionFormObject);
+  }
+
+  ngOnInit() {
+    this.matchmakingQueuedGroups$
+      .pipe(takeUntil(this.ngUnsubscribe$))
+      .subscribe((groups) => {
+        this.connectedPlayerDropLists = [
+          ...(groups?.map((group) => group.id) ?? []),
+          'nonMatchmadePlayersList',
+        ];
+      });
   }
 }
