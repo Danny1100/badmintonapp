@@ -195,6 +195,35 @@ export class MatchmakingService {
       'Error moving non-matchmade player to matchmaking queue: no group with less than 4 players found',
     );
   }
+  moveMatchmakingQueuedPlayerToNonMatchmadeList(player: Player) {
+    const matchmakingQueuedGroups = this.matchmakingQueuedGroups$.getValue();
+    for (let i = 0; i < matchmakingQueuedGroups.length; i++) {
+      const group = matchmakingQueuedGroups[i];
+      const playerIndex = group.players.findIndex((p) => p.id === player.id);
+      if (playerIndex !== -1) {
+        // remove player from the group
+        group.players.splice(playerIndex, 1);
+        const newMatchmakingQueuedGroups =
+          this.getUpdatedMatchmakingQueuedGroups(
+            matchmakingQueuedGroups,
+            this.waitingPlayers$.getValue(),
+          );
+        this.matchmakingQueuedGroups$.next(newMatchmakingQueuedGroups);
+
+        // add player to nonMatchmadePlayers$
+        const newNonMatchmadePlayers = this.getUpdatedNonMatchmadePlayers(
+          this.matchmakingQueuedGroups$.getValue(),
+          this.waitingPlayers$.getValue(),
+          this.selectedNonMatchmadePlayersSortOption$.getValue().value,
+        );
+        this.nonMatchmadePlayers$.next(newNonMatchmadePlayers);
+        return;
+      }
+    }
+    throw new Error(
+      'Error moving matchmaking queued player to non-matchmade list: player not found in any group',
+    );
+  }
   removeWaitingPlayer(playerId: number) {
     let waitingPlayers = this.waitingPlayers$.getValue();
     waitingPlayers = waitingPlayers.filter((player) => player.id !== playerId);

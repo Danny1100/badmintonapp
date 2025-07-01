@@ -64,7 +64,12 @@
                         class="dragging-placeholder"
                         *cdkDragPlaceholder
                       ></div>
-                      <div class="player-container">
+                      <div
+                        class="player-container"
+                        (dblclick)="
+                          moveMatchmakingQueuedPlayerToNonMatchmadeList(player)
+                        "
+                      >
                         <app-player
                           [id]="player.id"
                           [name]="player.name"

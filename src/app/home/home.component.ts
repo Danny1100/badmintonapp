@@ -100,6 +100,11 @@ export class HomeComponent {
   moveNonMatchmadePlayerToMatchmakingQueue(player: Player) {
     this.matchmakingService.moveNonMatchmadePlayerToMatchmakingQueue(player);
   }
+  moveMatchmakingQueuedPlayerToNonMatchmadeList(player: Player) {
+    this.matchmakingService.moveMatchmakingQueuedPlayerToNonMatchmadeList(
+      player,
+    );
+  }
   selectSortOption(sortOptionFormObject: PlayersSortOptionFormObject) {
     this.selectedNonMatchmadePlayersSortOption$.next(sortOptionFormObject);
   }
