@@ -10,6 +10,7 @@ import { AsyncPipe } from '@angular/common';
 import {
   CdkDragDrop,
   DragDropModule,
+  moveItemInArray,
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
 import {
@@ -59,7 +60,7 @@ export class HomeComponent {
     event.preventDefault();
   }
 
-  drop(event: CdkDragDrop<Player[]>) {
+  dropPlayer(event: CdkDragDrop<Player[]>) {
     if (event === null || event.previousContainer === event.container) return;
 
     // ensures max number of players in a matchmadeGroup is 4
@@ -90,6 +91,11 @@ export class HomeComponent {
         this.selectedNonMatchmadePlayersSortOption$.getValue().value,
       );
     this.nonMatchmadePlayers$.next(newNonMatchmadePlayers);
+  }
+  dropGroup(event: CdkDragDrop<MatchmakingGroup[]>) {
+    const groups = this.matchmakingQueuedGroups$.getValue();
+    moveItemInArray(groups, event.previousIndex, event.currentIndex);
+    this.matchmakingQueuedGroups$.next(groups);
   }
   moveNonMatchmadePlayerToMatchmakingQueue(player: Player) {
     this.matchmakingService.moveNonMatchmadePlayerToMatchmakingQueue(player);

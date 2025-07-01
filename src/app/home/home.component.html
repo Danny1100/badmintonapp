@@ -30,7 +30,13 @@
           @if ((matchmakingQueuedGroups$ | async)?.length) {
             <h2 class="mb-3">Queued Groups</h2>
           }
-          <div class="queued-groups-list-container my-3 mx-3">
+          <div
+            class="queued-groups-list-container my-3 mx-3"
+            cdkDropList
+            cdkDropListOrientation="horizontal"
+            [cdkDropListData]="(matchmakingQueuedGroups$ | async) ?? []"
+            (cdkDropListDropped)="dropGroup($event)"
+          >
             @for (
               group of matchmakingQueuedGroups$ | async;
               track group.id;
@@ -40,11 +46,12 @@
                 <p class="waiting-group-number">{{ groupIndex + 1 }}.</p>
                 <div
                   class="waiting-group-players-container"
+                  cdkDrag
                   cdkDropList
                   [id]="group.id"
                   [cdkDropListData]="group.players"
                   [cdkDropListConnectedTo]="connectedPlayerDropLists"
-                  (cdkDropListDropped)="drop($event)"
+                  (cdkDropListDropped)="dropPlayer($event)"
                   cdkDropListSortingDisabled
                 >
                   @for (
@@ -121,7 +128,7 @@
             cdkDropListOrientation="mixed"
             [cdkDropListData]="(nonMatchmadePlayers$ | async) ?? []"
             [cdkDropListConnectedTo]="connectedPlayerDropLists"
-            (cdkDropListDropped)="drop($event)"
+            (cdkDropListDropped)="dropPlayer($event)"
             cdkDropListSortingDisabled
           >
             @for (
