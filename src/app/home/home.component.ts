@@ -97,6 +97,11 @@ export class HomeComponent {
     moveItemInArray(groups, event.previousIndex, event.currentIndex);
     this.matchmakingQueuedGroups$.next(groups);
   }
+  dropCourt(event: CdkDragDrop<Court[]>) {
+    const courts = this.courts$.getValue();
+    moveItemInArray(courts, event.previousIndex, event.currentIndex);
+    this.courts$.next(courts);
+  }
   moveNonMatchmadePlayerToMatchmakingQueue(player: Player) {
     this.matchmakingService.moveNonMatchmadePlayerToMatchmakingQueue(player);
   }

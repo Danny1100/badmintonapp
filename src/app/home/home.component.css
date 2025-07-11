@@ -51,6 +51,9 @@
   margin-top: 2px;
   width: 20px;
 }
+.court-container {
+  cursor: move;
+}
 .player-container {
   cursor: move;
 }
@@ -74,5 +77,25 @@
 }
 .queued-groups-list-container.cdk-drop-list-dragging
   .waiting-group-players-container:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drag-preview.court-container {
+  border: none;
+  box-sizing: border-box;
+  border-radius: 4px;
+  box-shadow:
+    0 5px 5px -3px rgba(0, 0, 0, 0.2),
+    0 8px 10px 1px rgba(0, 0, 0, 0.14),
+    0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+.cdk-drag-placeholder.court-container {
+  opacity: 0;
+}
+.cdk-drag-animating.court-container {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+.court-list-container.cdk-drop-list-dragging
+  .court-container:not(.cdk-drag-placeholder) {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }

@@ -6,15 +6,19 @@
   </head>
   <body>
     <div class="container-fluid p-3">
-      <div class="court-list-container">
+      <div
+        class="court-list-container"
+        cdkDropList
+        [cdkDropListData]="(courts$ | async) ?? []"
+        cdkDropListOrientation="mixed"
+        (cdkDropListDropped)="dropCourt($event)"
+      >
         @for (court of courts$ | async; track court.courtNumber) {
-          <div>
-            <div class="court-container mb-3">
-              <app-court
-                [courtNumber]="court.courtNumber"
-                [players]="court.players"
-              ></app-court>
-            </div>
+          <div class="court-container mb-3" cdkDrag>
+            <app-court
+              [courtNumber]="court.courtNumber"
+              [players]="court.players"
+            ></app-court>
           </div>
         }
       </div>
