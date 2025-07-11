@@ -1,5 +1,5 @@
 import { Component, HostListener } from '@angular/core';
-import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, combineLatest, Subject, takeUntil } from 'rxjs';
 import { Player } from '../player/services/player.service';
 import { PlayerListService } from './player-list-service/player-list.service';
 import { MatchmakingService } from '../matchmaking/matchmaking.service';
@@ -47,31 +47,13 @@ export class PlayerListComponent {
               ),
           );
       });
-    this.selectedPlayerListSortOption$
+    combineLatest([this.selectedPlayerListSortOption$, this.waitingPlayers$])
       .pipe(takeUntil(this.ngUnsubscribe$))
-      .subscribe((sortOption) => {
-        const sortOptionValue = sortOption.value;
-        let newSortedWaitingPlayers = this.waitingPlayers$.getValue().slice(); // slice to avoid mutating the original array
-        if (sortOptionValue === PlayersSortOption.Waiting)
-          this.sortedWaitingPlayers = newSortedWaitingPlayers;
-        else if (sortOptionValue === PlayersSortOption.Name) {
-          this.sortedWaitingPlayers = newSortedWaitingPlayers.sort(
-            (player1, player2) => player1.name.localeCompare(player2.name),
-          );
-        } else if (sortOptionValue === PlayersSortOption.SkillLevel) {
-          this.sortedWaitingPlayers = newSortedWaitingPlayers.sort(
-            (player1, player2) => {
-              if (player1.skillId !== player2.skillId) {
-                return player1.skillId - player2.skillId;
-              }
-              return player1.name.localeCompare(player2.name);
-            },
-          );
-        } else {
-          throw new Error(
-            'Invalid sortOption when updating nonMatchmadePlayers',
-          );
-        }
+      .subscribe(() => {
+        const sortOption = this.selectedPlayerListSortOption$.getValue();
+        this.sortedWaitingPlayers = this.getNewSortedWaitingPlayers(
+          sortOption.value,
+        );
       });
   }
 
@@ -79,6 +61,9 @@ export class PlayerListComponent {
     event.preventDefault();
   }
   removePlayer(playerId: number) {
+    this.selectedPlayers = this.selectedPlayers.filter(
+      (p) => p.id !== playerId,
+    );
     this.playerListService.removePlayer(playerId);
     this.matchmakingService.removeWaitingPlayer(playerId);
   }
@@ -132,7 +117,27 @@ export class PlayerListComponent {
     // this.clearSelectedPlayers();
   }
   selectSortOption(sortOptionFormObject: PlayersSortOptionFormObject) {
+    this.clearSelectedPlayers();
     this.selectedPlayerListSortOption$.next(sortOptionFormObject);
+  }
+  getNewSortedWaitingPlayers(sortOptionValue: PlayersSortOption) {
+    let newSortedWaitingPlayers = this.waitingPlayers$.getValue().slice(); // slice to avoid mutating the original array
+    if (sortOptionValue === PlayersSortOption.Waiting)
+      return newSortedWaitingPlayers;
+    else if (sortOptionValue === PlayersSortOption.Name) {
+      return newSortedWaitingPlayers.sort((player1, player2) =>
+        player1.name.localeCompare(player2.name),
+      );
+    } else if (sortOptionValue === PlayersSortOption.SkillLevel) {
+      return newSortedWaitingPlayers.sort((player1, player2) => {
+        if (player1.skillId !== player2.skillId) {
+          return player1.skillId - player2.skillId;
+        }
+        return player1.name.localeCompare(player2.name);
+      });
+    } else {
+      throw new Error('Invalid sortOption when updating nonMatchmadePlayers');
+    }
   }
 
   ngOnDestroy() {
