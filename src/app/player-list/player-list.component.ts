@@ -1,10 +1,14 @@
 import { Component, HostListener } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
 import { Player } from '../player/services/player.service';
 import { PlayerListService } from './player-list-service/player-list.service';
 import { MatchmakingService } from '../matchmaking/matchmaking.service';
 import { PlayerComponent } from '../player/player.component';
 import { AsyncPipe } from '@angular/common';
+import {
+  PlayersSortOption,
+  PlayersSortOptionFormObject,
+} from '../matchmaking/matchmaking.util';
 
 @Component({
   selector: 'app-player-list',
@@ -16,24 +20,59 @@ import { AsyncPipe } from '@angular/common';
 export class PlayerListComponent {
   waitingPlayers$: BehaviorSubject<Player[]> =
     this.matchmakingService.getWaitingPlayers();
+  sortedWaitingPlayers: Player[] = [];
   currentlyPlayingPlayers: Player[] = [];
   selectedPlayers: Player[] = [];
+
+  sortPlayerOptions = this.matchmakingService.getSortPlayerOptions();
+  selectedPlayerListSortOption$ =
+    this.playerListService.getSelectedPlayerListSortOptionStream();
+
+  private ngUnsubscribe$: Subject<boolean> = new Subject();
 
   constructor(
     private playerListService: PlayerListService,
     private matchmakingService: MatchmakingService,
   ) {
-    this.waitingPlayers$.subscribe((waitingPlayers) => {
-      this.currentlyPlayingPlayers = this.playerListService
-        .getPlayers()
-        .getValue()
-        .filter(
-          (player) =>
-            !waitingPlayers.find(
-              (waitingPlayer) => waitingPlayer.id === player.id,
-            ),
-        );
-    });
+    this.waitingPlayers$
+      .pipe(takeUntil(this.ngUnsubscribe$))
+      .subscribe((waitingPlayers) => {
+        this.currentlyPlayingPlayers = this.playerListService
+          .getPlayers()
+          .getValue()
+          .filter(
+            (player) =>
+              !waitingPlayers.find(
+                (waitingPlayer) => waitingPlayer.id === player.id,
+              ),
+          );
+      });
+    this.selectedPlayerListSortOption$
+      .pipe(takeUntil(this.ngUnsubscribe$))
+      .subscribe((sortOption) => {
+        const sortOptionValue = sortOption.value;
+        let newSortedWaitingPlayers = this.waitingPlayers$.getValue().slice(); // slice to avoid mutating the original array
+        if (sortOptionValue === PlayersSortOption.Waiting)
+          this.sortedWaitingPlayers = newSortedWaitingPlayers;
+        else if (sortOptionValue === PlayersSortOption.Name) {
+          this.sortedWaitingPlayers = newSortedWaitingPlayers.sort(
+            (player1, player2) => player1.name.localeCompare(player2.name),
+          );
+        } else if (sortOptionValue === PlayersSortOption.SkillLevel) {
+          this.sortedWaitingPlayers = newSortedWaitingPlayers.sort(
+            (player1, player2) => {
+              if (player1.skillId !== player2.skillId) {
+                return player1.skillId - player2.skillId;
+              }
+              return player1.name.localeCompare(player2.name);
+            },
+          );
+        } else {
+          throw new Error(
+            'Invalid sortOption when updating nonMatchmadePlayers',
+          );
+        }
+      });
   }
 
   @HostListener('window:beforeunload', ['$event']) onRefresh(event: Event) {
@@ -91,5 +130,13 @@ export class PlayerListComponent {
     // const waitingPlayers = this.matchmakingService.waitingPlayers$.getValue();
     // this.matchmakingService.matchmake(waitingPlayers, waitingPlayers.length);
     // this.clearSelectedPlayers();
+  }
+  selectSortOption(sortOptionFormObject: PlayersSortOptionFormObject) {
+    this.selectedPlayerListSortOption$.next(sortOptionFormObject);
+  }
+
+  ngOnDestroy() {
+    this.ngUnsubscribe$.next(true);
+    this.ngUnsubscribe$.complete();
   }
 }

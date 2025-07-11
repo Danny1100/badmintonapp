@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, ReplaySubject } from 'rxjs';
 import { Player } from '../../player/services/player.service';
+import {
+  PlayersSortOption,
+  PlayersSortOptionFormObject,
+} from 'src/app/matchmaking/matchmaking.util';
 
 @Injectable({
   providedIn: 'root',
@@ -12,6 +16,11 @@ export class PlayerListService {
     Player[]
   >([]);
   private addedPlayer$: ReplaySubject<Player> = new ReplaySubject<Player>();
+  private selectedPlayerListSortOption$ =
+    new BehaviorSubject<PlayersSortOptionFormObject>({
+      label: 'Name',
+      value: PlayersSortOption.Name,
+    });
 
   constructor() {}
 
@@ -23,6 +32,9 @@ export class PlayerListService {
   }
   getAddedPlayerStream() {
     return this.addedPlayer$;
+  }
+  getSelectedPlayerListSortOptionStream() {
+    return this.selectedPlayerListSortOption$;
   }
   addPlayer(player: Player) {
     const newPlayerList = this.playerList$.getValue();

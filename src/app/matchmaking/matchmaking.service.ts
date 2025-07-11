@@ -34,6 +34,11 @@ export class MatchmakingService {
       label: 'Name',
       value: PlayersSortOption.Name,
     });
+  private sortPlayerOptions: PlayersSortOptionFormObject[] = [
+    { label: 'Name', value: PlayersSortOption.Name },
+    { label: 'Wait Time', value: PlayersSortOption.Waiting },
+    { label: 'Skill Level', value: PlayersSortOption.SkillLevel },
+  ];
 
   private waitingDuration$: BehaviorSubject<
     Map<number, { player: Player; waitPeriod: number }>
@@ -101,6 +106,9 @@ export class MatchmakingService {
   }
   getSelectedNonMatchmadePlayersSortOptionStream() {
     return this.selectedNonMatchmadePlayersSortOption$;
+  }
+  getSortPlayerOptions() {
+    return this.sortPlayerOptions;
   }
   getUpdatedMatchmakingQueuedGroups(
     matchmakingQueuedGroups: MatchmakingGroup[],

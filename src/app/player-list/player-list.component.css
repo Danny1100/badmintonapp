@@ -2,6 +2,14 @@
   display: flex;
   gap: 20px;
 }
+.sort-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sort-option-dropdown-item {
+  cursor: default;
+}
 .player-list {
   max-height: 100vh;
   display: flex;

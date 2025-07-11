@@ -39,11 +39,7 @@ export class HomeComponent {
   nonMatchmadePlayers$: BehaviorSubject<Player[]> =
     this.matchmakingService.getNonMatchmadePlayers();
 
-  sortPlayerOptions: PlayersSortOptionFormObject[] = [
-    { label: 'Name', value: PlayersSortOption.Name },
-    { label: 'Wait Time', value: PlayersSortOption.Waiting },
-    { label: 'Skill Level', value: PlayersSortOption.SkillLevel },
-  ];
+  sortPlayerOptions = this.matchmakingService.getSortPlayerOptions();
   selectedNonMatchmadePlayersSortOption$ =
     this.matchmakingService.getSelectedNonMatchmadePlayersSortOptionStream();
 
