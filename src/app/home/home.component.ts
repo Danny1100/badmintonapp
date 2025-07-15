@@ -15,7 +15,6 @@ import {
 } from '@angular/cdk/drag-drop';
 import {
   MatchmakingGroup,
-  PlayersSortOption,
   PlayersSortOptionFormObject,
 } from '../matchmaking/matchmaking.util';
 
@@ -38,6 +37,9 @@ export class HomeComponent {
     this.matchmakingService.getMatchmakingQueuedGroups();
   nonMatchmadePlayers$: BehaviorSubject<Player[]> =
     this.matchmakingService.getNonMatchmadePlayers();
+
+  filterTerm = new BehaviorSubject<string>('');
+  filteredNonMatchmadePlayers: Player[] = [];
 
   sortPlayerOptions = this.matchmakingService.getSortPlayerOptions();
   selectedNonMatchmadePlayersSortOption$ =
@@ -109,6 +111,22 @@ export class HomeComponent {
   selectSortOption(sortOptionFormObject: PlayersSortOptionFormObject) {
     this.selectedNonMatchmadePlayersSortOption$.next(sortOptionFormObject);
   }
+  onSearch(value: string) {
+    this.filterTerm.next(value);
+  }
+  getFilteredNonMatchmadePlayers(
+    filterTerm: string,
+    nonMatchmadePlayers: Player[],
+  ): Player[] {
+    if (!filterTerm) return nonMatchmadePlayers;
+    const lowerCaseFilterTerm = filterTerm.toLowerCase();
+    return nonMatchmadePlayers.filter((player) =>
+      player.name
+        .toLowerCase()
+        .split(' ')
+        .some((word) => word.startsWith(lowerCaseFilterTerm)),
+    );
+  }
 
   ngOnInit() {
     this.matchmakingQueuedGroups$
@@ -118,6 +136,22 @@ export class HomeComponent {
           ...(groups?.map((group) => group.id) ?? []),
           'nonMatchmadePlayersList',
         ];
+      });
+    this.nonMatchmadePlayers$
+      .pipe(takeUntil(this.ngUnsubscribe$))
+      .subscribe((players) => {
+        this.filteredNonMatchmadePlayers = this.getFilteredNonMatchmadePlayers(
+          this.filterTerm.getValue(),
+          players,
+        );
+      });
+    this.filterTerm
+      .pipe(takeUntil(this.ngUnsubscribe$))
+      .subscribe((filterTerm) => {
+        this.filteredNonMatchmadePlayers = this.getFilteredNonMatchmadePlayers(
+          filterTerm,
+          this.nonMatchmadePlayers$.getValue(),
+        );
       });
   }
 }
