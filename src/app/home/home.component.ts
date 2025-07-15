@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Player } from '../player/services/player.service';
 import { Court, CourtComponent } from '../court/court.component';
 import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
@@ -40,6 +40,7 @@ export class HomeComponent {
 
   filterTerm = new BehaviorSubject<string>('');
   filteredNonMatchmadePlayers: Player[] = [];
+  @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
 
   sortPlayerOptions = this.matchmakingService.getSortPlayerOptions();
   selectedNonMatchmadePlayersSortOption$ =
@@ -139,11 +140,12 @@ export class HomeComponent {
       });
     this.nonMatchmadePlayers$
       .pipe(takeUntil(this.ngUnsubscribe$))
-      .subscribe((players) => {
-        this.filteredNonMatchmadePlayers = this.getFilteredNonMatchmadePlayers(
-          this.filterTerm.getValue(),
-          players,
-        );
+      .subscribe(() => {
+        // Reset filter term when players change
+        this.filterTerm.next('');
+        if (this.searchInput) {
+          this.searchInput.nativeElement.value = '';
+        }
       });
     this.filterTerm
       .pipe(takeUntil(this.ngUnsubscribe$))
