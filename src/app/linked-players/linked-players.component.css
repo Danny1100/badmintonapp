@@ -8,6 +8,17 @@
   align-items: center;
   gap: 20px;
 }
+.linked-group-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  background-color: rgb(227, 227, 227);
+  border-radius: 10px;
+  width: 200px;
+  height: 180px;
+}
 .btn-delete {
   width: 150px;
   height: 40px;

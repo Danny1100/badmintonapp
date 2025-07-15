@@ -1,19 +1,23 @@
 <div class="container-fluid p-3">
   <h2 class="mb-3">Linked Players</h2>
   @for (group of linkedPlayers$ | async; track group; let i = $index) {
-    <div
-      class="linked-players mb-3"
-      >
+    <div class="linked-players mb-3">
       <div class="linked-players-item">
-        <app-court
-          [courtNumber]="-1"
-          [players]="group"
-          [showButtons]="false"
-        ></app-court>
+        <div class="linked-group-container">
+          @for (player of group; track player.id; let playerIndex = $index) {
+            <div class="player-container">
+              <app-player
+                [id]="player.id"
+                [name]="player.name"
+                [skillId]="player.skillId"
+              ></app-player>
+            </div>
+          }
+        </div>
         <button
           class="btn btn-danger btn-delete"
           (click)="removeLinkedPlayers(group)"
-          >
+        >
           Delete
         </button>
       </div>

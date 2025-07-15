@@ -3,14 +3,9 @@
     @if ((waitingPlayers$ | async)?.length) {
       <h2 class="mb-3">Waiting Players</h2>
       <div class="button-toolbar mb-4">
-        <!-- TODO: Add link players button -->
-        <!-- <button
-              class="btn btn-primary mb-3 mr-3"
-              (click)="linkPlayers()"
-              disabled
-            >
-              Link Players
-            </button> -->
+        <button class="btn btn-primary mr-3" (click)="linkPlayers()">
+          Link Players
+        </button>
         <button class="btn btn-danger" (click)="clearSelectedPlayers()">
           Clear Selected Players
         </button>

@@ -25,11 +25,9 @@ export class LinkedPlayersService {
     const linkedPlayerIds = this.linkedPlayerIds$.getValue();
     group.forEach((player) => linkedPlayerIds.delete(player.id));
     this.linkedPlayerIds$.next(linkedPlayerIds);
+
     const linkedPlayers = this.linkedPlayers$.getValue();
-    const updatedLinkedPlayers = linkedPlayers.filter(
-      (linkedPlayers) =>
-        !linkedPlayers.find((player) => player.id === group[0].id),
-    );
+    const updatedLinkedPlayers = linkedPlayers.filter((g) => g !== group);
     this.linkedPlayers$.next(updatedLinkedPlayers);
   }
   removeLinkedPlayerById(id: number) {

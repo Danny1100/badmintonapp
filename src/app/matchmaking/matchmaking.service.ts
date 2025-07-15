@@ -472,6 +472,41 @@ export class MatchmakingService {
     // });
     // this.waitingGroups$.next(waitingGroups);
   }
+  linkPlayers(players: Player[]) {
+    const length = players.length;
+    if (length < 2 || length > 4) {
+      alert(
+        `Invalid number of selected players. Currently selected ${length} players.`,
+      );
+      return;
+    }
+    // check players are not already linked.
+    const linkedPlayerIds = this.linkedPlayersService
+      .getLinkedPlayerIds()
+      .getValue();
+    for (let i = 0; i < players.length; i++) {
+      const playerId = players[i].id;
+      if (linkedPlayerIds.has(playerId)) {
+        const playerName = players[i].name;
+        alert(
+          `Invalid group: ${playerName} (id: ${playerId}) is already linked.`,
+        );
+        return;
+      }
+    }
+    // add them to set of linked players so they cannot be added again later
+    players.forEach((player) => linkedPlayerIds.add(player.id));
+    this.linkedPlayersService.getLinkedPlayerIds().next(linkedPlayerIds);
+    // add them to link group
+    const linkedPlayers = this.linkedPlayersService
+      .getLinkedPlayers()
+      .getValue();
+    linkedPlayers.push(players);
+    this.linkedPlayersService.getLinkedPlayers().next(linkedPlayers);
+    // TODO: run matchmaking algorithm to update court queue
+    // const waitingPlayers = this.matchmakingService.waitingPlayers$.getValue();
+    // this.matchmakingService.matchmake(waitingPlayers, waitingPlayers.length);
+  }
 
   ngOnDestroy() {
     this.ngUnsubscribe$.next(true);
