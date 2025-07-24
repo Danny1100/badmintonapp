@@ -37,7 +37,7 @@
           <div
             class="queued-groups-list-container my-3 mx-3"
             cdkDropList
-            cdkDropListOrientation="horizontal"
+            cdkDropListOrientation="mixed"
             [cdkDropListData]="(matchmakingQueuedGroups$ | async) ?? []"
             (cdkDropListDropped)="dropGroup($event)"
           >
@@ -46,11 +46,10 @@
               track group.id;
               let groupIndex = $index
             ) {
-              <div class="waiting-group mx-3 mb-3">
+              <div class="waiting-group mx-3 mb-3" cdkDrag>
                 <p class="waiting-group-number">{{ groupIndex + 1 }}.</p>
                 <div
                   class="waiting-group-players-container"
-                  cdkDrag
                   cdkDropList
                   [id]="group.id"
                   [cdkDropListData]="group.players"
