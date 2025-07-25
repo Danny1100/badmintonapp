@@ -47,29 +47,34 @@ export class AddPlayerComponent {
     };
   }
 
-  addPlayersFromFile() {
-    if (confirm('Are you sure you want to add players from file?')) {
-      fetch('assets/players.csv')
-        .then((res) => res.text())
-        .then((data) => {
-          const players = parse<{ Name: string; 'Skill Level': string }>(data, {
-            header: true,
-          }).data.map((player) => ({
-            name: player.Name,
-            skillId: Object.keys(PlayerSkillLevelDesc).indexOf(
-              player['Skill Level'],
-            ),
-          }));
-          players.forEach((player) => {
-            if (!player.name || player.skillId < 0) return;
-            this.addedPlayer = {
-              ...this.addedPlayer,
-              ...player,
-            };
-            this.addPlayer();
-          });
-        });
-    }
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const csvText = reader.result as string;
+      const players = parse<{ Name: string; 'Skill Level': string }>(csvText, {
+        header: true,
+      }).data.map((player) => ({
+        name: player.Name,
+        skillId: Object.keys(PlayerSkillLevelDesc).indexOf(
+          player['Skill Level'],
+        ),
+      }));
+      players.forEach((player) => {
+        if (!player.name || player.skillId < 0) return;
+        this.addedPlayer = {
+          ...this.addedPlayer,
+          ...player,
+        };
+        this.addPlayer();
+      });
+    };
+
+    reader.readAsText(file);
   }
 
   resetForm() {

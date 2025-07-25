@@ -8,6 +8,9 @@
   display: flex;
   gap: 20px;
 }
+.file-input {
+  display: none;
+}
 .player-list {
   max-height: 60vh;
   display: flex;

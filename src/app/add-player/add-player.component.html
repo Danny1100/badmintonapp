@@ -41,7 +41,14 @@
         <button type="submit" class="btn btn-primary" (click)="addPlayer()">
           Add player
         </button>
-        <button class="btn btn-secondary" (click)="addPlayersFromFile()">
+        <input
+          #fileUpload
+          class="file-input"
+          type="file"
+          accept=".csv"
+          (change)="onFileSelected($event)"
+        />
+        <button class="btn btn-secondary" (click)="fileUpload.click()">
           Add players from file
         </button>
       </div>
