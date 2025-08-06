@@ -16,7 +16,7 @@ export enum PlayerSkillLevelDesc {
 }
 export enum PlayerSkillLevelColour {
   Cracked = '#f30da9',
-  Strong = '#f30d0d',
+  Strong = '#ff5636',
   Good = '#f3af0d',
   Average = '#0db2f3',
   Amateur = '#36c513',
