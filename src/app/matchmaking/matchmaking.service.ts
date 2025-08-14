@@ -20,25 +20,22 @@ export class MatchmakingService {
     this.playerListService.getAddedPlayerStream();
   private waitingPlayers$: BehaviorSubject<Player[]> = new BehaviorSubject<
     Player[]
-  >([]);
+  >([]); // all players who are not on a court
   private courtList$: BehaviorSubject<Court[]> =
     this.courtControllerService.getCourts();
 
   private matchmakingQueuedGroups$: BehaviorSubject<MatchmakingGroup[]> =
-    new BehaviorSubject<MatchmakingGroup[]>([]);
+    new BehaviorSubject<MatchmakingGroup[]>([]); // waiting players who are in a matchmade group
   private nonMatchmadePlayers$: BehaviorSubject<Player[]> = new BehaviorSubject<
     Player[]
-  >([]);
-  private selectedNonMatchmadePlayersSortOption$ =
-    new BehaviorSubject<PlayersSortOptionFormObject>({
-      label: 'Name',
-      value: PlayersSortOption.Name,
-    });
+  >([]); // waiting players who are not in a matchmade group
   private sortPlayerOptions: PlayersSortOptionFormObject[] = [
+    { label: 'Skill Level', value: PlayersSortOption.SkillLevel },
     { label: 'Name', value: PlayersSortOption.Name },
     { label: 'Wait Time', value: PlayersSortOption.Waiting },
-    { label: 'Skill Level', value: PlayersSortOption.SkillLevel },
   ];
+  private selectedNonMatchmadePlayersSortOption$ =
+    new BehaviorSubject<PlayersSortOptionFormObject>(this.sortPlayerOptions[0]);
 
   private waitingDuration$: BehaviorSubject<
     Map<number, { player: Player; waitPeriod: number }>
