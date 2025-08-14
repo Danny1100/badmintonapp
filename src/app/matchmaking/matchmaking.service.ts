@@ -190,7 +190,7 @@ export class MatchmakingService {
     matchmakingQueuedGroups: MatchmakingGroup[],
     nonMatchmadePlayers: Player[],
   ): Player[] {
-    const newUnarrivedPlayers = waitingPlayers.filter(
+    let newUnarrivedPlayers = waitingPlayers.filter(
       (player) => !player.arrived,
     );
     newUnarrivedPlayers.forEach((player) => {
@@ -205,6 +205,12 @@ export class MatchmakingService {
           `Player ${player.name} (id: ${player.id}) is in matchmaking queue or non-matchmade players list but is marked as not arrived.`,
         );
       }
+    });
+    newUnarrivedPlayers = newUnarrivedPlayers.sort((player1, player2) => {
+      if (player1.skillId !== player2.skillId) {
+        return player1.skillId - player2.skillId;
+      }
+      return player1.name.localeCompare(player2.name);
     });
     return newUnarrivedPlayers;
   }
