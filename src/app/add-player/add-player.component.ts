@@ -28,6 +28,7 @@ export class AddPlayerComponent {
     id: this.currentId$.getValue(),
     name: '',
     skillId: 0,
+    arrived: false,
   };
   playerList$: BehaviorSubject<Player[]> = this.playerListService.getPlayers();
 
@@ -79,7 +80,12 @@ export class AddPlayerComponent {
 
   resetForm() {
     const currentId = this.currentId$.getValue();
-    this.addedPlayer = { id: currentId + 1, name: '', skillId: 0 };
+    this.addedPlayer = {
+      id: currentId + 1,
+      name: '',
+      skillId: 0,
+      arrived: false,
+    };
     this.currentId$.next(currentId + 1);
     this.updateRadioButtons(
       {

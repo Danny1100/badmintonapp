@@ -24,6 +24,9 @@ export class MatchmakingService {
   private courtList$: BehaviorSubject<Court[]> =
     this.courtControllerService.getCourts();
 
+  private unarrivedPlayers$: BehaviorSubject<Player[]> = new BehaviorSubject<
+    Player[]
+  >([]); // players who have not arrived yet
   private matchmakingQueuedGroups$: BehaviorSubject<MatchmakingGroup[]> =
     new BehaviorSubject<MatchmakingGroup[]>([]); // waiting players who are in a matchmade group
   private nonMatchmadePlayers$: BehaviorSubject<Player[]> = new BehaviorSubject<
@@ -55,7 +58,7 @@ export class MatchmakingService {
         waitingPlayers.push(player);
         this.waitingPlayers$.next(waitingPlayers);
       });
-    // whenever waiting players list is updated, update nonMatchmadePlayers$ and matchmakingQueuedGroups$ accordingly
+    // whenever waiting players list is updated, update nonMatchmadePlayers$, matchmakingQueuedGroups$ and unarrivedPlayers$ accordingly
     this.waitingPlayers$
       .pipe(takeUntil(this.ngUnsubscribe$))
       .subscribe((waitingPlayers) => {
@@ -73,8 +76,15 @@ export class MatchmakingService {
           this.selectedNonMatchmadePlayersSortOption$.getValue().value,
         );
 
+        const newUnarrivedPlayers = this.getUpdatedUnarrivedPlayers(
+          waitingPlayers,
+          newMatchmakingQueuedGroups,
+          newNonMatchmadePlayers,
+        );
+
         this.matchmakingQueuedGroups$.next(newMatchmakingQueuedGroups);
         this.nonMatchmadePlayers$.next(newNonMatchmadePlayers);
+        this.unarrivedPlayers$.next(newUnarrivedPlayers);
       });
     // whenever selected player sort option is changed, sort update the non-matchmade player list
     this.selectedNonMatchmadePlayersSortOption$
@@ -97,6 +107,9 @@ export class MatchmakingService {
   }
   getNonMatchmadePlayers() {
     return this.nonMatchmadePlayers$;
+  }
+  getUnarrivedPlayers() {
+    return this.unarrivedPlayers$;
   }
   getWaitingDuration() {
     return this.waitingDuration$;
@@ -147,7 +160,7 @@ export class MatchmakingService {
       const isInMatchmakingQueue = matchmakingQueuedGroups.some((group) =>
         group.players.some((p) => p.id === player.id),
       );
-      if (!isInMatchmakingQueue) {
+      if (!isInMatchmakingQueue && player.arrived) {
         newNonMatchmadePlayers.push(player);
       }
     });
@@ -171,6 +184,29 @@ export class MatchmakingService {
     }
 
     return newNonMatchmadePlayers;
+  }
+  getUpdatedUnarrivedPlayers(
+    waitingPlayers: Player[],
+    matchmakingQueuedGroups: MatchmakingGroup[],
+    nonMatchmadePlayers: Player[],
+  ): Player[] {
+    const newUnarrivedPlayers = waitingPlayers.filter(
+      (player) => !player.arrived,
+    );
+    newUnarrivedPlayers.forEach((player) => {
+      const isInMatchmakingQueue = matchmakingQueuedGroups.some((group) =>
+        group.players.some((p) => p.id === player.id),
+      );
+      const isInNonMatchmadePlayers = nonMatchmadePlayers.some(
+        (p) => p.id === player.id,
+      );
+      if (isInMatchmakingQueue || isInNonMatchmadePlayers) {
+        throw new Error(
+          `Player ${player.name} (id: ${player.id}) is in matchmaking queue or non-matchmade players list but is marked as not arrived.`,
+        );
+      }
+    });
+    return newUnarrivedPlayers;
   }
   moveNonMatchmadePlayerToMatchmakingQueue(player: Player) {
     const matchmakingQueuedGroups = this.matchmakingQueuedGroups$.getValue();
@@ -228,6 +264,18 @@ export class MatchmakingService {
     throw new Error(
       'Error moving matchmaking queued player to non-matchmade list: player not found in any group',
     );
+  }
+  setPlayerArrived(player: Player) {
+    const waitingPlayers = this.waitingPlayers$.getValue();
+    const index = waitingPlayers.findIndex((p) => p.id === player.id);
+    if (index === -1) {
+      alert(
+        `Error trying to set player to arrived. Player with id ${player.id} not found in waiting players list.`,
+      );
+      return;
+    }
+    waitingPlayers[index] = { ...player, arrived: true };
+    this.waitingPlayers$.next(waitingPlayers);
   }
   removeWaitingPlayer(playerId: number) {
     let waitingPlayers = this.waitingPlayers$.getValue();

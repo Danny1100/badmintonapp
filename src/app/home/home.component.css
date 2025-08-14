@@ -8,12 +8,12 @@
   display: flex;
   flex-wrap: wrap;
 }
-.non-matchmade-players-list-container {
+.players-list-container {
   flex: 1;
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
-  max-height: 30vw;
+  height: 30vw;
   align-content: flex-start;
 }
 .non-matchmade-players-header {

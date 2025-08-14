@@ -37,6 +37,8 @@ export class HomeComponent {
     this.matchmakingService.getMatchmakingQueuedGroups();
   nonMatchmadePlayers$: BehaviorSubject<Player[]> =
     this.matchmakingService.getNonMatchmadePlayers();
+  unarrivedPlayers$: BehaviorSubject<Player[]> =
+    this.matchmakingService.getUnarrivedPlayers();
 
   filterTerm = new BehaviorSubject<string>('');
   filteredNonMatchmadePlayers: Player[] = [];
@@ -108,6 +110,9 @@ export class HomeComponent {
     this.matchmakingService.moveMatchmakingQueuedPlayerToNonMatchmadeList(
       player,
     );
+  }
+  setPlayerArrived(player: Player) {
+    this.matchmakingService.setPlayerArrived(player);
   }
   selectSortOption(sortOptionFormObject: PlayersSortOptionFormObject) {
     this.selectedNonMatchmadePlayersSortOption$.next(sortOptionFormObject);

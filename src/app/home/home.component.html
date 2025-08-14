@@ -88,9 +88,9 @@
           </div>
         </div>
         <div class="non-matchmade-players-container">
-          @if ((nonMatchmadePlayers$ | async)?.length) {
-            <div class="non-matchmade-players-header">
-              <h2 class="mb-3">Not Queued Players</h2>
+          <div class="non-matchmade-players-header">
+            <h2 class="mb-3">Not Queued Players</h2>
+            @if ((nonMatchmadePlayers$ | async)?.length) {
               <div class="sort-container">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -151,10 +151,13 @@
                   />
                 </div>
               </div>
-            </div>
+            }
+          </div>
+          @if (!(nonMatchmadePlayers$ | async)?.length) {
+            <p class="mx-3 mb-4">No Unqueued Players</p>
           }
           <div
-            class="non-matchmade-players-list-container my-3 mx-3"
+            class="non-matchmade-players-list-container players-list-container my-3 mx-3"
             cdkDropList
             id="nonMatchmadePlayersList"
             cdkDropListOrientation="mixed"
@@ -189,6 +192,28 @@
                     [skillId]="player.skillId"
                   ></app-player>
                 </div>
+              </div>
+            }
+          </div>
+        </div>
+        <div class="unarrived-players-container">
+          <h2 class="mb-3">Unarrived Players</h2>
+          @if (!(nonMatchmadePlayers$ | async)?.length) {
+            <p class="mx-3 mb-4">No Unarrived Players</p>
+          }
+          <div
+            class="unarrived-players-list-container players-list-container my-3 mx-3"
+          >
+            @for (player of unarrivedPlayers$ | async; track player.id) {
+              <div
+                class="unarrived-player mx-3 mb-2"
+                (dblclick)="setPlayerArrived(player)"
+              >
+                <app-player
+                  [id]="player.id"
+                  [name]="player.name"
+                  [skillId]="player.skillId"
+                ></app-player>
               </div>
             }
           </div>

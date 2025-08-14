@@ -4,6 +4,7 @@ export interface Player {
   id: number;
   name: string;
   skillId: number;
+  arrived: boolean;
 }
 export enum PlayerSkillLevelDesc {
   Cracked = 'Cracked',
