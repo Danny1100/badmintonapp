@@ -16,6 +16,16 @@ export enum PlayerSkillLevelDesc {
   New = 'New',
   Organiser = 'Organiser',
 }
+export enum PlayerSkillLevelColourName {
+  Pink = 'Pink',
+  Red = 'Red',
+  Orange = 'Orange',
+  Blue = 'Blue',
+  Purple = 'Purple',
+  Green = 'Green',
+  Yellow = 'Yellow',
+  Teal = 'Teal',
+}
 export enum PlayerSkillLevelColour {
   Cracked = '#f30da9',
   Strong = '#ff5636',
@@ -28,6 +38,7 @@ export enum PlayerSkillLevelColour {
 }
 export interface PlayerSkillData {
   skillLevel: PlayerSkillLevelDesc;
+  colourName: PlayerSkillLevelColourName;
   colour: PlayerSkillLevelColour;
 }
 
@@ -36,37 +47,45 @@ export interface PlayerSkillData {
 })
 export class PlayerService {
   // player skill level - lower number/index is higher skill
-  private skillMap = [
+  private skillMap: PlayerSkillData[] = [
     {
       skillLevel: PlayerSkillLevelDesc.Cracked,
+      colourName: PlayerSkillLevelColourName.Pink,
       colour: PlayerSkillLevelColour.Cracked,
     },
     {
       skillLevel: PlayerSkillLevelDesc.Strong,
+      colourName: PlayerSkillLevelColourName.Red,
       colour: PlayerSkillLevelColour.Strong,
     },
     {
       skillLevel: PlayerSkillLevelDesc.Good,
+      colourName: PlayerSkillLevelColourName.Orange,
       colour: PlayerSkillLevelColour.Good,
     },
     {
       skillLevel: PlayerSkillLevelDesc.Average,
+      colourName: PlayerSkillLevelColourName.Blue,
       colour: PlayerSkillLevelColour.Average,
     },
     {
       skillLevel: PlayerSkillLevelDesc.Novice,
+      colourName: PlayerSkillLevelColourName.Purple,
       colour: PlayerSkillLevelColour.Novice,
     },
     {
       skillLevel: PlayerSkillLevelDesc.Amateur,
+      colourName: PlayerSkillLevelColourName.Green,
       colour: PlayerSkillLevelColour.Amateur,
     },
     {
       skillLevel: PlayerSkillLevelDesc.New,
+      colourName: PlayerSkillLevelColourName.Yellow,
       colour: PlayerSkillLevelColour.New,
     },
     {
       skillLevel: PlayerSkillLevelDesc.Organiser,
+      colourName: PlayerSkillLevelColourName.Teal,
       colour: PlayerSkillLevelColour.Organiser,
     },
   ];

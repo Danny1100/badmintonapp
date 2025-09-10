@@ -4,6 +4,7 @@ import {
   PlayerService,
   PlayerSkillData,
   PlayerSkillLevelColour,
+  PlayerSkillLevelColourName,
   PlayerSkillLevelDesc,
 } from '../player/services/player.service';
 import { BehaviorSubject } from 'rxjs';
@@ -61,7 +62,7 @@ export class AddPlayerComponent {
         header: true,
       }).data.map((player) => ({
         name: player.Name,
-        skillId: Object.keys(PlayerSkillLevelDesc).indexOf(
+        skillId: Object.keys(PlayerSkillLevelColourName).indexOf(
           player['Skill Level'],
         ),
       }));
@@ -90,6 +91,7 @@ export class AddPlayerComponent {
     this.updateRadioButtons(
       {
         skillLevel: PlayerSkillLevelDesc.Cracked,
+        colourName: PlayerSkillLevelColourName.Pink,
         colour: PlayerSkillLevelColour.Cracked,
       },
       0,
