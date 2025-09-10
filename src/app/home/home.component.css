@@ -73,7 +73,6 @@
   .waiting-group:not(.cdk-drag-placeholder) {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
-
 .cdk-drag-preview.court-container {
   border: none;
   box-sizing: border-box;
@@ -92,4 +91,9 @@
 .court-list-container.cdk-drop-list-dragging
   .court-container:not(.cdk-drag-placeholder) {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+.unarrived-player {
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
