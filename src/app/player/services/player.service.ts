@@ -11,6 +11,7 @@ export enum PlayerSkillLevelDesc {
   Strong = 'Strong',
   Good = 'Good',
   Average = 'Average',
+  Novice = 'Novice',
   Amateur = 'Amateur',
   New = 'New',
   Organiser = 'Organiser',
@@ -20,6 +21,7 @@ export enum PlayerSkillLevelColour {
   Strong = '#ff5636',
   Good = '#f3af0d',
   Average = '#0db2f3',
+  Novice = '#b863ff',
   Amateur = '#36c513',
   New = '#ecfc05',
   Organiser = '#00fcf0',
@@ -50,6 +52,10 @@ export class PlayerService {
     {
       skillLevel: PlayerSkillLevelDesc.Average,
       colour: PlayerSkillLevelColour.Average,
+    },
+    {
+      skillLevel: PlayerSkillLevelDesc.Novice,
+      colour: PlayerSkillLevelColour.Novice,
     },
     {
       skillLevel: PlayerSkillLevelDesc.Amateur,
