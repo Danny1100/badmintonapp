@@ -34,14 +34,6 @@ export class CourtComponent {
       players: this.players,
     });
   }
-  // TODO: implement undo functionality
-  // undo() {
-  //   if (this.players.length === 0) return;
-  //   this.matchmakingService.undoCourt({
-  //     courtNumber: this.courtNumber,
-  //     players: this.players,
-  //   });
-  // }
   removeCourt() {
     if (this.players.length > 0) {
       alert('Cannot remove court, there are still people playing');
