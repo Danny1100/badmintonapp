@@ -7,10 +7,14 @@ import { Court } from '../court/court.component';
 })
 export class CourtControllerService {
   private courts$: BehaviorSubject<Court[]> = new BehaviorSubject<Court[]>([
-    { courtNumber: 1, players: [] },
     { courtNumber: 2, players: [] },
     { courtNumber: 3, players: [] },
     { courtNumber: 4, players: [] },
+    { courtNumber: 5, players: [] },
+    { courtNumber: 6, players: [] },
+    { courtNumber: 7, players: [] },
+    { courtNumber: 8, players: [] },
+    { courtNumber: 22, players: [] },
   ]);
 
   constructor() {}
