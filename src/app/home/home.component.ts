@@ -161,4 +161,9 @@ export class HomeComponent {
         );
       });
   }
+
+  ngOnDestroy() {
+    this.ngUnsubscribe$.next(true);
+    this.ngUnsubscribe$.complete();
+  }
 }
