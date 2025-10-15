@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
 import { Court } from '../court/court.component';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CourtControllerService {
+  readonly LOCAL_STORAGE_KEY: string = 'courts';
   private courts$: BehaviorSubject<Court[]> = new BehaviorSubject<Court[]>([
     { courtNumber: 2, players: [] },
     { courtNumber: 3, players: [] },
@@ -17,7 +18,13 @@ export class CourtControllerService {
     { courtNumber: 22, players: [] },
   ]);
 
-  constructor() {}
+  private ngUnsubscribe$: Subject<boolean> = new Subject();
+
+  constructor() {
+    this.courts$.pipe(takeUntil(this.ngUnsubscribe$)).subscribe((courts) => {
+      localStorage.setItem(this.LOCAL_STORAGE_KEY, JSON.stringify(courts));
+    });
+  }
 
   getCourts() {
     return this.courts$;
@@ -45,5 +52,22 @@ export class CourtControllerService {
       return c;
     });
     this.courts$.next(courts);
+  }
+
+  updateCourtsFromLocalStorage() {
+    const data = localStorage.getItem(this.LOCAL_STORAGE_KEY);
+    if (data) {
+      try {
+        const courts = JSON.parse(data);
+        this.courts$.next(courts);
+      } catch (e) {
+        alert('Error parsing courts from local storage');
+      }
+    }
+  }
+
+  ngOnDestroy() {
+    this.ngUnsubscribe$.next(true);
+    this.ngUnsubscribe$.complete();
   }
 }

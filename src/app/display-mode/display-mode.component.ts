@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CourtControllerService } from '../court-controller/court-controller.service';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { Court, CourtComponent } from '../court/court.component';
 import { AsyncPipe } from '@angular/common';
 import { DragDropModule } from '@angular/cdk/drag-drop';
@@ -15,5 +15,20 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 export class DisplayModeComponent {
   courts$: BehaviorSubject<Court[]> = this.courtControllerService.getCourts();
 
+  private ngUnsubscribe$: Subject<boolean> = new Subject();
+
   constructor(private courtControllerService: CourtControllerService) {}
+
+  ngOnInit() {
+    window.addEventListener('storage', (event) => {
+      if (event.key === this.courtControllerService.LOCAL_STORAGE_KEY) {
+        this.courtControllerService.updateCourtsFromLocalStorage();
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.ngUnsubscribe$.next(true);
+    this.ngUnsubscribe$.complete();
+  }
 }
