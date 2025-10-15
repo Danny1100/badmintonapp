@@ -7,25 +7,37 @@ import { Court } from '../court/court.component';
 })
 export class CourtControllerService {
   readonly LOCAL_STORAGE_KEY: string = 'courts';
-  private courts$: BehaviorSubject<Court[]> = new BehaviorSubject<Court[]>([
-    { courtNumber: 2, players: [] },
-    { courtNumber: 3, players: [] },
-    { courtNumber: 4, players: [] },
-    { courtNumber: 5, players: [] },
-    { courtNumber: 6, players: [] },
-    { courtNumber: 7, players: [] },
-    { courtNumber: 8, players: [] },
-    { courtNumber: 22, players: [] },
-  ]);
+  readonly DEFAULT_COURT_NUMBERS: number[] = [2, 3, 4, 5, 6, 7, 8, 22];
+  private courts$: BehaviorSubject<Court[]> = new BehaviorSubject<Court[]>(
+    this.getDefaultCourts(this.DEFAULT_COURT_NUMBERS),
+  );
 
   private ngUnsubscribe$: Subject<boolean> = new Subject();
 
   constructor() {
+    const data = localStorage.getItem(this.LOCAL_STORAGE_KEY);
+    if (data) {
+      try {
+        const courts = JSON.parse(data);
+        this.courts$ = new BehaviorSubject<Court[]>(courts);
+      } catch (e) {
+        this.courts$ = new BehaviorSubject<Court[]>(
+          this.getDefaultCourts(this.DEFAULT_COURT_NUMBERS),
+        );
+      }
+    }
+
     this.courts$.pipe(takeUntil(this.ngUnsubscribe$)).subscribe((courts) => {
       localStorage.setItem(this.LOCAL_STORAGE_KEY, JSON.stringify(courts));
     });
   }
 
+  getDefaultCourts(defaultCourtNumbers: number[]): Court[] {
+    return defaultCourtNumbers.map((courtNumber) => ({
+      courtNumber,
+      players: [],
+    }));
+  }
   getCourts() {
     return this.courts$;
   }
