@@ -1,0 +1,13 @@
+<div class="container-fluid p-3">
+  <h2 class="mb-3">Display Mode</h2>
+  <div class="court-list-container">
+    @for (court of courts$ | async; track court.courtNumber) {
+      <div class="court-container mb-3" cdkDrag>
+        <app-court
+          [courtNumber]="court.courtNumber"
+          [players]="court.players"
+        ></app-court>
+      </div>
+    }
+  </div>
+</div>

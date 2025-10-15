@@ -4,6 +4,7 @@ import { HomeComponent } from './home/home.component';
 import { AddPlayerComponent } from './add-player/add-player.component';
 import { LinkedPlayersComponent } from './linked-players/linked-players.component';
 import { PlayerListComponent } from './player-list/player-list.component';
+import { DisplayModeComponent } from './display-mode/display-mode.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -11,6 +12,7 @@ const routes: Routes = [
   { path: 'add-players', component: AddPlayerComponent },
   { path: 'player-list', component: PlayerListComponent },
   { path: 'linked-players', component: LinkedPlayersComponent },
+  { path: 'display-mode', component: DisplayModeComponent },
 ];
 
 @NgModule({
