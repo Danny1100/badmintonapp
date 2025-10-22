@@ -11,4 +11,35 @@
       </div>
     }
   </div>
+  <div class="queued-groups-list-container my-3 mx-3">
+    @for (
+      group of matchmakingQueuedGroups$ | async;
+      track group.id;
+      let groupIndex = $index
+    ) {
+      <div class="waiting-group mx-3 mb-3" cdkDrag>
+        <p class="waiting-group-number">{{ groupIndex + 1 }}.</p>
+        <div
+          class="waiting-group-players-container"
+          cdkDropList
+          [id]="group.id"
+        >
+          @for (
+            player of group.players;
+            track player.id;
+            let playerIndex = $index
+          ) {
+            <div class="player-container">
+              <app-player
+                [id]="player.id"
+                [name]="player.name"
+                [skillId]="player.skillId"
+              ></app-player>
+            </div>
+          }
+        </div>
+      </div>
+      <hr />
+    }
+  </div>
 </div>

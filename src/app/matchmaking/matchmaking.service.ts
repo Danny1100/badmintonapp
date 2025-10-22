@@ -27,6 +27,8 @@ export class MatchmakingService {
   private unarrivedPlayers$: BehaviorSubject<Player[]> = new BehaviorSubject<
     Player[]
   >([]); // players who have not arrived yet
+  private readonly MATCHMAKING_QUEUED_GROUPS_LOCAL_STORAGE_KEY =
+    'matchmakingQueuedGroups';
   private matchmakingQueuedGroups$: BehaviorSubject<MatchmakingGroup[]> =
     new BehaviorSubject<MatchmakingGroup[]>([]); // waiting players who are in a matchmade group
   private nonMatchmadePlayers$: BehaviorSubject<Player[]> = new BehaviorSubject<
@@ -97,6 +99,36 @@ export class MatchmakingService {
         );
         this.nonMatchmadePlayers$.next(newNonMatchmadePlayers);
       });
+
+    // #region persist matchmaking queued groups to localStorage
+    // Load from localStorage on service init
+    this.updateMatchmakingQueuedGroupsFromLocalStorage();
+
+    // Listen for localStorage changes from other tabs
+    window.addEventListener('storage', (event) => {
+      switch (event.key) {
+        case this.MATCHMAKING_QUEUED_GROUPS_LOCAL_STORAGE_KEY:
+          this.updateMatchmakingQueuedGroupsFromLocalStorage();
+          break;
+        case null:
+          // Clear event
+          this.matchmakingQueuedGroups$.next([]);
+          break;
+        default:
+          break;
+      }
+    });
+
+    // Save to localStorage on changes
+    this.matchmakingQueuedGroups$
+      .pipe(takeUntil(this.ngUnsubscribe$))
+      .subscribe((groups) => {
+        localStorage.setItem(
+          this.MATCHMAKING_QUEUED_GROUPS_LOCAL_STORAGE_KEY,
+          JSON.stringify(groups),
+        );
+      });
+    // #endregion
   }
 
   getWaitingPlayers() {
@@ -364,6 +396,22 @@ export class MatchmakingService {
       .getValue();
     linkedPlayers.push(players);
     this.linkedPlayersService.getLinkedPlayers().next(linkedPlayers);
+  }
+
+  updateMatchmakingQueuedGroupsFromLocalStorage() {
+    const data = localStorage.getItem(
+      this.MATCHMAKING_QUEUED_GROUPS_LOCAL_STORAGE_KEY,
+    );
+    if (data) {
+      try {
+        const groups = JSON.parse(data);
+        this.matchmakingQueuedGroups$.next(groups);
+      } catch (e) {
+        alert('Error parsing matchmaking groups from local storage');
+      }
+    } else {
+      this.matchmakingQueuedGroups$.next([]);
+    }
   }
 
   ngOnDestroy() {
