@@ -19,14 +19,6 @@ export class DisplayModeComponent {
 
   constructor(private courtControllerService: CourtControllerService) {}
 
-  ngOnInit() {
-    window.addEventListener('storage', (event) => {
-      if (event.key === this.courtControllerService.LOCAL_STORAGE_KEY) {
-        this.courtControllerService.updateCourtsFromLocalStorage();
-      }
-    });
-  }
-
   ngOnDestroy() {
     this.ngUnsubscribe$.next(true);
     this.ngUnsubscribe$.complete();

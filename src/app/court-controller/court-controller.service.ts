@@ -15,18 +15,24 @@ export class CourtControllerService {
   private ngUnsubscribe$: Subject<boolean> = new Subject();
 
   constructor() {
-    const data = localStorage.getItem(this.LOCAL_STORAGE_KEY);
-    if (data) {
-      try {
-        const courts = JSON.parse(data);
-        this.courts$ = new BehaviorSubject<Court[]>(courts);
-      } catch (e) {
-        this.courts$ = new BehaviorSubject<Court[]>(
-          this.getDefaultCourts(this.DEFAULT_COURT_NUMBERS),
-        );
-      }
-    }
+    this.updateCourtsFromLocalStorage();
 
+    // Listen for local storage changes from other tabs
+    window.addEventListener('storage', (event) => {
+      switch (event.key) {
+        case this.LOCAL_STORAGE_KEY:
+          this.updateCourtsFromLocalStorage();
+          break;
+        case null:
+          // Clear event
+          this.courts$.next(this.getDefaultCourts(this.DEFAULT_COURT_NUMBERS));
+          break;
+        default:
+          break;
+      }
+    });
+
+    // Save courts to local storage on changes
     this.courts$.pipe(takeUntil(this.ngUnsubscribe$)).subscribe((courts) => {
       localStorage.setItem(this.LOCAL_STORAGE_KEY, JSON.stringify(courts));
     });
@@ -75,6 +81,8 @@ export class CourtControllerService {
       } catch (e) {
         alert('Error parsing courts from local storage');
       }
+    } else {
+      this.courts$.next(this.getDefaultCourts(this.DEFAULT_COURT_NUMBERS));
     }
   }
 
