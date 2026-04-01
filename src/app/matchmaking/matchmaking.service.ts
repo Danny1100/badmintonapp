@@ -235,7 +235,7 @@ export class MatchmakingService {
         this.matchmakingQueuedGroups$.next(updatedGroups);
         const newMatchmakingQueuedGroups =
           this.getUpdatedMatchmakingQueuedGroups(
-            matchmakingQueuedGroups,
+            updatedGroups,
             this.waitingPlayers$.getValue(),
           );
         this.matchmakingQueuedGroups$.next(newMatchmakingQueuedGroups);
