@@ -13,24 +13,25 @@ export class CourtControllerService {
   );
 
   private ngUnsubscribe$: Subject<boolean> = new Subject();
+  private storageEventListener = (event: StorageEvent) => {
+    switch (event.key) {
+      case this.LOCAL_STORAGE_KEY:
+        this.updateCourtsFromLocalStorage();
+        break;
+      case null:
+        // Clear event
+        this.courts$.next(this.getDefaultCourts(this.DEFAULT_COURT_NUMBERS));
+        break;
+      default:
+        break;
+    }
+  };
 
   constructor() {
     this.updateCourtsFromLocalStorage();
 
     // Listen for local storage changes from other tabs
-    window.addEventListener('storage', (event) => {
-      switch (event.key) {
-        case this.LOCAL_STORAGE_KEY:
-          this.updateCourtsFromLocalStorage();
-          break;
-        case null:
-          // Clear event
-          this.courts$.next(this.getDefaultCourts(this.DEFAULT_COURT_NUMBERS));
-          break;
-        default:
-          break;
-      }
-    });
+    window.addEventListener('storage', this.storageEventListener);
 
     // Save courts to local storage on changes
     this.courts$.pipe(takeUntil(this.ngUnsubscribe$)).subscribe((courts) => {
@@ -53,8 +54,7 @@ export class CourtControllerService {
       alert('Court already exists');
       return;
     }
-    courts.push({ courtNumber, players: [] });
-    this.courts$.next(courts);
+    this.courts$.next([...courts, { courtNumber, players: [] }]);
   }
   removeCourt(courtNumber: number) {
     let courts = this.courts$.getValue();
@@ -87,6 +87,7 @@ export class CourtControllerService {
   }
 
   ngOnDestroy() {
+    window.removeEventListener('storage', this.storageEventListener);
     this.ngUnsubscribe$.next(true);
     this.ngUnsubscribe$.complete();
   }

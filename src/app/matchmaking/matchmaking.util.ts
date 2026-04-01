@@ -21,3 +21,16 @@ export function getNewGroup(): MatchmakingGroup {
     players: [],
   };
 }
+
+export function sortPlayers(
+  players: Player[],
+  sortOption: PlayersSortOption,
+): Player[] {
+  if (sortOption === PlayersSortOption.Waiting) return players;
+  return [...players].sort((a, b) => {
+    if (sortOption === PlayersSortOption.SkillLevel && a.skillId !== b.skillId) {
+      return a.skillId - b.skillId;
+    }
+    return a.name.localeCompare(b.name);
+  });
+}

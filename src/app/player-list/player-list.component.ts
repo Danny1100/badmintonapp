@@ -8,6 +8,7 @@ import { AsyncPipe } from '@angular/common';
 import {
   PlayersSortOption,
   PlayersSortOptionFormObject,
+  sortPlayers,
 } from '../matchmaking/matchmaking.util';
 
 @Component({
@@ -23,6 +24,7 @@ export class PlayerListComponent {
   sortedWaitingPlayers: Player[] = [];
   currentlyPlayingPlayers: Player[] = [];
   selectedPlayers: Player[] = [];
+  selectedPlayerIds: Set<number> = new Set();
 
   sortPlayerOptions = this.matchmakingService.getSortPlayerOptions();
   selectedPlayerListSortOption$ =
@@ -71,19 +73,20 @@ export class PlayerListComponent {
     const isChecked = (<HTMLInputElement>event.target).checked;
     if (isChecked) {
       this.selectedPlayers.push(player);
+      this.selectedPlayerIds.add(player.id);
     } else {
       this.selectedPlayers = this.selectedPlayers.filter(
         (p) => player.id !== p.id,
       );
+      this.selectedPlayerIds.delete(player.id);
     }
   }
   clearSelectedPlayers() {
-    const elements = document.querySelectorAll('.waiting-player-checkbox');
-    elements.forEach((el) => {
-      const element = el as HTMLInputElement;
-      element.checked = false;
-    });
     this.selectedPlayers = [];
+    this.selectedPlayerIds = new Set();
+  }
+  isPlayerSelected(playerId: number): boolean {
+    return this.selectedPlayerIds.has(playerId);
   }
   linkPlayers() {
     this.matchmakingService.linkPlayers(this.selectedPlayers);
@@ -94,23 +97,7 @@ export class PlayerListComponent {
     this.selectedPlayerListSortOption$.next(sortOptionFormObject);
   }
   getNewSortedWaitingPlayers(sortOptionValue: PlayersSortOption) {
-    let newSortedWaitingPlayers = this.waitingPlayers$.getValue().slice(); // slice to avoid mutating the original array
-    if (sortOptionValue === PlayersSortOption.Waiting)
-      return newSortedWaitingPlayers;
-    else if (sortOptionValue === PlayersSortOption.Name) {
-      return newSortedWaitingPlayers.sort((player1, player2) =>
-        player1.name.localeCompare(player2.name),
-      );
-    } else if (sortOptionValue === PlayersSortOption.SkillLevel) {
-      return newSortedWaitingPlayers.sort((player1, player2) => {
-        if (player1.skillId !== player2.skillId) {
-          return player1.skillId - player2.skillId;
-        }
-        return player1.name.localeCompare(player2.name);
-      });
-    } else {
-      throw new Error('Invalid sortOption when updating nonMatchmadePlayers');
-    }
+    return sortPlayers(this.waitingPlayers$.getValue(), sortOptionValue);
   }
 
   ngOnDestroy() {

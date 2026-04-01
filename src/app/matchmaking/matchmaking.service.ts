@@ -10,6 +10,7 @@ import {
   MatchmakingGroup,
   PlayersSortOption,
   PlayersSortOptionFormObject,
+  sortPlayers,
 } from './matchmaking.util';
 
 @Injectable({
@@ -46,6 +47,19 @@ export class MatchmakingService {
     Map<number, { player: Player; waitPeriod: number }>
   > = new BehaviorSubject(new Map());
   private ngUnsubscribe$: Subject<boolean> = new Subject();
+  private storageEventListener = (event: StorageEvent) => {
+    switch (event.key) {
+      case this.MATCHMAKING_QUEUED_GROUPS_LOCAL_STORAGE_KEY:
+        this.updateMatchmakingQueuedGroupsFromLocalStorage();
+        break;
+      case null:
+        // Clear event
+        this.matchmakingQueuedGroups$.next([]);
+        break;
+      default:
+        break;
+    }
+  };
 
   constructor(
     private playerListService: PlayerListService,
@@ -56,9 +70,8 @@ export class MatchmakingService {
     this.addedPlayer$
       .pipe(takeUntil(this.ngUnsubscribe$))
       .subscribe((player) => {
-        let waitingPlayers = this.waitingPlayers$.getValue();
-        waitingPlayers.push(player);
-        this.waitingPlayers$.next(waitingPlayers);
+        const waitingPlayers = this.waitingPlayers$.getValue();
+        this.waitingPlayers$.next([...waitingPlayers, player]);
       });
     // whenever waiting players list is updated, update nonMatchmadePlayers$, matchmakingQueuedGroups$ and unarrivedPlayers$ accordingly
     this.waitingPlayers$
@@ -105,19 +118,7 @@ export class MatchmakingService {
     this.updateMatchmakingQueuedGroupsFromLocalStorage();
 
     // Listen for localStorage changes from other tabs
-    window.addEventListener('storage', (event) => {
-      switch (event.key) {
-        case this.MATCHMAKING_QUEUED_GROUPS_LOCAL_STORAGE_KEY:
-          this.updateMatchmakingQueuedGroupsFromLocalStorage();
-          break;
-        case null:
-          // Clear event
-          this.matchmakingQueuedGroups$.next([]);
-          break;
-        default:
-          break;
-      }
-    });
+    window.addEventListener('storage', this.storageEventListener);
 
     // Save to localStorage on changes
     this.matchmakingQueuedGroups$
@@ -197,25 +198,7 @@ export class MatchmakingService {
       }
     });
 
-    if (sortOption === PlayersSortOption.Waiting) return newNonMatchmadePlayers;
-    else if (sortOption === PlayersSortOption.Name) {
-      newNonMatchmadePlayers = newNonMatchmadePlayers.sort((player1, player2) =>
-        player1.name.localeCompare(player2.name),
-      );
-    } else if (sortOption === PlayersSortOption.SkillLevel) {
-      newNonMatchmadePlayers = newNonMatchmadePlayers.sort(
-        (player1, player2) => {
-          if (player1.skillId !== player2.skillId) {
-            return player1.skillId - player2.skillId;
-          }
-          return player1.name.localeCompare(player2.name);
-        },
-      );
-    } else {
-      throw new Error('Invalid sortOption when updating nonMatchmadePlayers');
-    }
-
-    return newNonMatchmadePlayers;
+    return sortPlayers(newNonMatchmadePlayers, sortOption);
   }
   getUpdatedUnarrivedPlayers(
     waitingPlayers: Player[],
@@ -238,13 +221,7 @@ export class MatchmakingService {
         );
       }
     });
-    newUnarrivedPlayers = newUnarrivedPlayers.sort((player1, player2) => {
-      if (player1.skillId !== player2.skillId) {
-        return player1.skillId - player2.skillId;
-      }
-      return player1.name.localeCompare(player2.name);
-    });
-    return newUnarrivedPlayers;
+    return sortPlayers(newUnarrivedPlayers, PlayersSortOption.SkillLevel);
   }
   moveNonMatchmadePlayerToMatchmakingQueue(player: Player) {
     const matchmakingQueuedGroups = this.matchmakingQueuedGroups$.getValue();
@@ -252,8 +229,10 @@ export class MatchmakingService {
       const group = matchmakingQueuedGroups[i];
       if (group.players.length < 4) {
         // add player to the first group with less than 4 players
-        group.players.push(player);
-        this.matchmakingQueuedGroups$.next(matchmakingQueuedGroups);
+        const updatedGroups = matchmakingQueuedGroups.map((g, idx) =>
+          idx === i ? { ...g, players: [...g.players, player] } : g,
+        );
+        this.matchmakingQueuedGroups$.next(updatedGroups);
         const newMatchmakingQueuedGroups =
           this.getUpdatedMatchmakingQueuedGroups(
             matchmakingQueuedGroups,
@@ -281,10 +260,14 @@ export class MatchmakingService {
       const playerIndex = group.players.findIndex((p) => p.id === player.id);
       if (playerIndex !== -1) {
         // remove player from the group
-        group.players.splice(playerIndex, 1);
+        const updatedGroups = matchmakingQueuedGroups.map((g, idx) =>
+          idx === i
+            ? { ...g, players: g.players.filter((p) => p.id !== player.id) }
+            : g,
+        );
         const newMatchmakingQueuedGroups =
           this.getUpdatedMatchmakingQueuedGroups(
-            matchmakingQueuedGroups,
+            updatedGroups,
             this.waitingPlayers$.getValue(),
           );
         this.matchmakingQueuedGroups$.next(newMatchmakingQueuedGroups);
@@ -312,8 +295,10 @@ export class MatchmakingService {
       );
       return;
     }
-    waitingPlayers[index] = { ...player, arrived: true };
-    this.waitingPlayers$.next(waitingPlayers);
+    const updatedWaitingPlayers = waitingPlayers.map((p, i) =>
+      i === index ? { ...player, arrived: true } : p,
+    );
+    this.waitingPlayers$.next(updatedWaitingPlayers);
   }
   removeWaitingPlayer(playerId: number) {
     let waitingPlayers = this.waitingPlayers$.getValue();
@@ -329,9 +314,8 @@ export class MatchmakingService {
   cycleCourt(court: Court) {
     // if there are players on the court, move them all to the bottom of the waiting players list and update the court list
     if (court.players.length > 0) {
-      let waitingPlayers = this.waitingPlayers$.getValue();
-      court.players.forEach((player) => waitingPlayers.push(player));
-      this.waitingPlayers$.next(waitingPlayers);
+      const waitingPlayers = this.waitingPlayers$.getValue();
+      this.waitingPlayers$.next([...waitingPlayers, ...court.players]);
       this.courtControllerService.updateCourt({ ...court, players: [] });
       return;
     }
@@ -388,14 +372,14 @@ export class MatchmakingService {
       }
     }
     // add them to set of linked players so they cannot be added again later
-    players.forEach((player) => linkedPlayerIds.add(player.id));
-    this.linkedPlayersService.getLinkedPlayerIds().next(linkedPlayerIds);
+    const newLinkedPlayerIds = new Set(linkedPlayerIds);
+    players.forEach((player) => newLinkedPlayerIds.add(player.id));
+    this.linkedPlayersService.getLinkedPlayerIds().next(newLinkedPlayerIds);
     // add them to link group
     const linkedPlayers = this.linkedPlayersService
       .getLinkedPlayers()
       .getValue();
-    linkedPlayers.push(players);
-    this.linkedPlayersService.getLinkedPlayers().next(linkedPlayers);
+    this.linkedPlayersService.getLinkedPlayers().next([...linkedPlayers, players]);
   }
 
   updateMatchmakingQueuedGroupsFromLocalStorage() {
@@ -415,6 +399,7 @@ export class MatchmakingService {
   }
 
   ngOnDestroy() {
+    window.removeEventListener('storage', this.storageEventListener);
     this.ngUnsubscribe$.next(true);
     this.ngUnsubscribe$.complete();
   }

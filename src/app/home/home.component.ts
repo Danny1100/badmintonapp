@@ -94,12 +94,12 @@ export class HomeComponent {
     this.nonMatchmadePlayers$.next(newNonMatchmadePlayers);
   }
   dropGroup(event: CdkDragDrop<MatchmakingGroup[]>) {
-    const groups = this.matchmakingQueuedGroups$.getValue();
+    const groups = [...this.matchmakingQueuedGroups$.getValue()];
     moveItemInArray(groups, event.previousIndex, event.currentIndex);
     this.matchmakingQueuedGroups$.next(groups);
   }
   dropCourt(event: CdkDragDrop<Court[]>) {
-    const courts = this.courts$.getValue();
+    const courts = [...this.courts$.getValue()];
     moveItemInArray(courts, event.previousIndex, event.currentIndex);
     this.courts$.next(courts);
   }

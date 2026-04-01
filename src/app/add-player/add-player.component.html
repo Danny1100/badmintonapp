@@ -25,12 +25,11 @@
                 autocomplete="off"
                 [(ngModel)]="addedPlayer.skillId"
                 value="{{ i }}"
-                (change)="updateRadioButtons(lvl, i)"
               />
               <label
                 class="btn player-skill-level-label"
                 for="{{ i }}"
-                [ngStyle]="getRadioStyle(lvl)"
+                [ngStyle]="getRadioStyle(lvl, i)"
                 >{{ lvl.colourName }}</label
               >
             </div>

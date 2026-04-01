@@ -82,6 +82,7 @@
               class="waiting-player-checkbox form-check-input mt-1"
               type="checkbox"
               id="{{ i }}"
+              [checked]="isPlayerSelected(player.id)"
               (change)="selectPlayer($event, player)"
               aria-label="waiting-player-checkbox"
             />

@@ -15,7 +15,7 @@ export class PlayerListService {
   private playerList$: BehaviorSubject<Player[]> = new BehaviorSubject<
     Player[]
   >([]);
-  private addedPlayer$: ReplaySubject<Player> = new ReplaySubject<Player>();
+  private addedPlayer$: ReplaySubject<Player> = new ReplaySubject<Player>(1);
   private selectedPlayerListSortOption$ =
     new BehaviorSubject<PlayersSortOptionFormObject>({
       label: 'Name',
@@ -37,9 +37,8 @@ export class PlayerListService {
     return this.selectedPlayerListSortOption$;
   }
   addPlayer(player: Player) {
-    const newPlayerList = this.playerList$.getValue();
-    newPlayerList.push(player);
-    this.playerList$.next(newPlayerList);
+    const playerList = this.playerList$.getValue();
+    this.playerList$.next([...playerList, player]);
 
     this.addedPlayer$.next(player);
   }

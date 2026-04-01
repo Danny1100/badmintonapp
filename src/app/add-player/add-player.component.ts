@@ -3,9 +3,7 @@ import {
   Player,
   PlayerService,
   PlayerSkillData,
-  PlayerSkillLevelColour,
   PlayerSkillLevelColourName,
-  PlayerSkillLevelDesc,
 } from '../player/services/player.service';
 import { BehaviorSubject } from 'rxjs';
 import { PlayerListService } from '../player-list/player-list-service/player-list.service';
@@ -42,10 +40,14 @@ export class AddPlayerComponent {
     event.preventDefault();
   }
 
-  getRadioStyle(playerSkillLevel: PlayerSkillData) {
+  getRadioStyle(playerSkillLevel: PlayerSkillData, index: number) {
     return {
       width: '150px',
       border: `1px solid ${playerSkillLevel.colour}`,
+      'background-color':
+        Number(this.addedPlayer.skillId) === index
+          ? playerSkillLevel.colour
+          : 'white',
     };
   }
 
@@ -88,14 +90,6 @@ export class AddPlayerComponent {
       arrived: false,
     };
     this.currentId$.next(currentId + 1);
-    this.updateRadioButtons(
-      {
-        skillLevel: PlayerSkillLevelDesc.Cracked,
-        colourName: PlayerSkillLevelColourName.Pink,
-        colour: PlayerSkillLevelColour.Cracked,
-      },
-      0,
-    );
   }
   addPlayer() {
     if (!this.addedPlayer.name) {
@@ -112,19 +106,5 @@ export class AddPlayerComponent {
 
   ngOnInit() {
     this.skillLevels = this.playerService.getSkillMap();
-  }
-  ngAfterViewInit() {
-    this.updateRadioButtons(this.skillLevels[0], 0);
-  }
-  updateRadioButtons(lvl: PlayerSkillData, index: number) {
-    const elements = document.querySelectorAll('.player-skill-level-label');
-    elements.forEach((element, i) => {
-      const el = element as HTMLLabelElement;
-      if (i === index) {
-        el.style.backgroundColor = lvl.colour;
-      } else {
-        el.style.backgroundColor = 'white';
-      }
-    });
   }
 }
