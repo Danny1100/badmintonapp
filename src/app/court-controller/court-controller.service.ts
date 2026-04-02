@@ -11,6 +11,7 @@ export class CourtControllerService {
   private courts$: BehaviorSubject<Court[]> = new BehaviorSubject<Court[]>(
     this.getDefaultCourts(this.DEFAULT_COURT_NUMBERS),
   );
+  private courtTimerStartTimestamps: Map<number, number> = new Map();
 
   private ngUnsubscribe$: Subject<boolean> = new Subject();
   private storageEventListener = (event: StorageEvent) => {
@@ -60,6 +61,7 @@ export class CourtControllerService {
     let courts = this.courts$.getValue();
     courts = courts.filter((court) => court.courtNumber !== courtNumber);
     this.courts$.next(courts);
+    this.courtTimerStartTimestamps.delete(courtNumber);
   }
   updateCourt(court: Court) {
     let courts = this.courts$.getValue();
@@ -70,6 +72,16 @@ export class CourtControllerService {
       return c;
     });
     this.courts$.next(courts);
+  }
+
+  startCourtTimer(courtNumber: number) {
+    this.courtTimerStartTimestamps.set(courtNumber, Date.now());
+  }
+  clearCourtTimer(courtNumber: number) {
+    this.courtTimerStartTimestamps.delete(courtNumber);
+  }
+  getCourtTimerStartTimestamp(courtNumber: number): number | undefined {
+    return this.courtTimerStartTimestamps.get(courtNumber);
   }
 
   updateCourtsFromLocalStorage() {

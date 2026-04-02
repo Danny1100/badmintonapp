@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Player } from '../player/services/player.service';
 import { CourtControllerService } from '../court-controller/court-controller.service';
 import { MatchmakingService } from '../matchmaking/matchmaking.service';
@@ -16,11 +16,13 @@ export interface Court {
   standalone: true,
   imports: [PlayerComponent],
 })
-export class CourtComponent {
+export class CourtComponent implements OnInit, OnDestroy {
   @Input({ required: true }) courtNumber!: number;
   @Input({ required: true }) players!: Player[];
   @Input() showButtons = true;
   disableNextCourtButton = true;
+  stopwatchDisplay = '00:00';
+  private displayInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor(
     private courtControllerService: CourtControllerService,
@@ -42,8 +44,28 @@ export class CourtComponent {
     this.courtControllerService.removeCourt(this.courtNumber);
   }
 
+  private updateStopwatch() {
+    const startTimestamp = this.courtControllerService.getCourtTimerStartTimestamp(this.courtNumber);
+    if (startTimestamp) {
+      const elapsed = Math.floor((Date.now() - startTimestamp) / 1000);
+      const minutes = Math.floor(elapsed / 60);
+      const seconds = elapsed % 60;
+      this.stopwatchDisplay = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    } else {
+      this.stopwatchDisplay = '00:00';
+    }
+  }
+
   ngOnInit() {
     // every time you cycle court, a new court component is created, this ensures no accidental double clicks of next court button
     setTimeout(() => (this.disableNextCourtButton = false), 200);
+    this.updateStopwatch();
+    this.displayInterval = setInterval(() => this.updateStopwatch(), 1000);
+  }
+
+  ngOnDestroy() {
+    if (this.displayInterval) {
+      clearInterval(this.displayInterval);
+    }
   }
 }

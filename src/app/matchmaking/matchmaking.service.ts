@@ -317,6 +317,7 @@ export class MatchmakingService {
       const waitingPlayers = this.waitingPlayers$.getValue();
       this.waitingPlayers$.next([...waitingPlayers, ...court.players]);
       this.courtControllerService.updateCourt({ ...court, players: [] });
+      this.courtControllerService.clearCourtTimer(court.courtNumber);
       return;
     }
     // get first waiting group
@@ -342,6 +343,7 @@ export class MatchmakingService {
       return c;
     });
     this.courtList$.next(updatedCourts);
+    this.courtControllerService.startCourtTimer(court.courtNumber);
     // remove the players from the waiting players list
     let waitingPlayers = this.waitingPlayers$.getValue();
     const newWaitingPlayers = waitingPlayers.filter((player) => {
