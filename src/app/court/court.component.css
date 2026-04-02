@@ -20,12 +20,6 @@
   margin: 0;
 }
 
-.stopwatch {
-  font-size: 1.2rem;
-  font-variant-numeric: tabular-nums;
-  padding: 4px 0;
-}
-
 .players {
   flex: 5;
   display: flex;
